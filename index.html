@@ -133,9 +133,9 @@
         <!-- 2. RECHERCHE & FILTRES -->
         <section id="filter-section" class="section-card sticky top-0 rounded-t-none z-40 bg-white/95 backdrop-blur-sm shadow-xl mb-6 rounded-xl">
 
-            <!-- INSERTAR AQUÍ: Barra de Búsqueda (P-2 o P-4 según el relleno de tu card) -->
-            <div class="px-2 pt-2 md:px-4 md:pt-4">
-                <div class="relative group">
+            <div class="px-2 pt-2 md:px-4 md:pt-4 flex items-center gap-2">
+                <!-- El buscador ocupa el espacio sobrante -->
+                <div class="relative group flex-1">
                     <!-- Icono Lupa -->
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
                         <i class="fa-solid fa-magnifying-glass text-xs"></i>
@@ -154,6 +154,17 @@
                         <i class="fa-solid fa-circle-xmark text-sm"></i>
                     </button>
                 </div>
+
+                <!-- Botones de ayuda alineados a la derecha -->
+                <div class="flex gap-1">
+                    <button @click="showInfoPopup = true" class="btn-corner" title="Informations">
+                        <i class="fa-solid fa-info text-xl"></i>
+                    </button>
+                    <button @click="showHelpPopup = true" class="btn-corner" title="Aide">
+                        <i class="fa-solid fa-question text-xl"></i>
+                    </button>
+                </div>                
+                
             </div>
 
             
