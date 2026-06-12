@@ -100,6 +100,30 @@
             background-color: #cbd5e1; /* Slate 300 */
             color: #1e293b;            /* Slate 800: texto un poco más oscuro */ 
         }
+
+        /* Pastilla Fantasma Sugerida */
+        .ghost-pill {
+            position: absolute;
+            top: -22px; /* Flota sobre el input */
+            left: 12px;
+            background-color: #f1f5f9; /* Slate 100 */
+            color: #6366f1; /* Indigo 500 */
+            border: 1px dashed #cbd5e1; /* Borde discontinuo para dar idea de "borrador" */
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .ghost-pill:hover {
+            background-color: #e0e7ff;
+            border-style: solid;
+        }
         
     </style>
 </head>
@@ -122,9 +146,18 @@
         <!-- 2. RECHERCHE & FILTRES -->
         <section id="filter-section" class="section-card sticky top-0 rounded-t-none z-40 bg-white/95 backdrop-blur-sm shadow-xl mb-6 rounded-xl">
 
-            <!-- INSERTAR AQUÍ: Barra de Búsqueda (P-2 o P-4 según el relleno de tu card) -->
+            <!-- Barra de Búsqueda (P-2 o P-4 según el relleno de tu card) -->
             <div class="px-2 pt-2 md:px-4 md:pt-4">
                 <div class="relative group">
+            
+                    <!-- PASTILLA FANTASMA (Solo se ve si hay sugerencia) -->
+                    <div v-if="ghostSuggestion" 
+                         @click="searchQuery = ghostSuggestion" 
+                         class="ghost-pill">
+                        <i class="fa-solid fa-wand-magic-sparkles opacity-70"></i>
+                        {{ ghostSuggestion }} ?
+                    </div>
+                    
                     <!-- Icono Lupa -->
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
                         <i class="fa-solid fa-magnifying-glass text-xs"></i>
@@ -345,6 +378,7 @@ createApp({
             showRange11to20: false,             
             selectedPlayers: [],
             sortBy: 'ideal',
+            searchDictionary: [], 
             searchQuery: '', 
             games: [],
             categories: [
@@ -429,6 +463,19 @@ createApp({
         
                 return getWeightedRank(a) - getWeightedRank(b);
             });
+        },
+        ghostSuggestion() {
+            const q = this.normalize(this.searchQuery);
+            if (q.length < 2) return null; // Solo sugerir a partir de 2 letras
+        
+            // Buscamos en el diccionario algo que EMPIECE por lo que el usuario escribe
+            // o que lo contenga de forma muy cercana.
+            const match = this.searchDictionary.find(term => {
+                const normTerm = this.normalize(term);
+                return normTerm.startsWith(q) && normTerm !== q;
+            });
+        
+            return match || null;
         }
     },
     methods: {
@@ -497,7 +544,17 @@ createApp({
                                 ...this.getLabels(row.Jeu_Origine),
                                 ...this.getLabels(author),
                                 ...this.getLabels(rawLabels)
-                            ];                            
+                            ];
+                            
+                            const allTerms = new Set();
+                            this.games.forEach(g => {
+                                if (g.name) allTerms.add(g.name);
+                                if (g.author) allTerms.add(g.author);
+                                // Opcional: añadir también los labels individuales al diccionario
+                                if (g.labels) g.labels.forEach(l => allTerms.add(l));
+                            });
+                            this.searchDictionary = Array.from(allTerms);
+                            
                             return {
                                 id: index, name: row.Nom_Adaptation, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
                                 author: author, labels: gameLabels,
