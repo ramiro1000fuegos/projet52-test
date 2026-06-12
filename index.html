@@ -109,6 +109,17 @@
         
         <!-- 1. HEADER EDITORIAL -->
         <header class="py-4 flex flex-col md:flex-row justify-between items-start gap-8 border-b border-slate-200 mb-4 md:mb-10">
+        
+            <!-- Boutons en haut à droite -->
+            <div class="absolute top-0 right-0 flex gap-2">
+                <button @click="showInfoPopup = true" class="btn-corner" title="Informations">
+                    <i class="fa-solid fa-circle-info"></i>
+                </button>
+                <button @click="showHelpPopup = true" class="btn-corner" title="Aide">
+                    <i class="fa-solid fa-circle-question"></i>
+                </button>
+            </div>
+            
             <div class="max-w-2xl">
                 <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase leading-none mb-4">
                     PROJET <span class="text-indigo-600">52 CARTES</span>
