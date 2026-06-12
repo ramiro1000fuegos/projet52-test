@@ -128,6 +128,21 @@
             background-color: #cbd5e1; /* Slate 300 */
             color: #1e293b;            /* Slate 800: texto un poco más oscuro */ 
         }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 24rem; /* max-w-sm */
+            width: 100%;
+            position: relative;
+            text-align: center;
+            
+            /* SEGURIDAD PARA TEXTOS LARGOS */
+            max-height: 85vh;    /* Altura máxima: 85% de la pantalla */
+            overflow-y: auto;    /* Si el texto sobra, aparece un scroll interno */
+        }        
         
     </style>
 </head>
@@ -416,7 +431,11 @@
                     <i class="fa-solid fa-circle-info"></i>
                 </div>
                 <p class="text-slate-600 font-medium leading-relaxed">
-                    tOTOTOTOTOTOTO
+
+À propos des adaptations
+
+La plupart des jeux sont des adaptations de titres publiés, rendues jouables avec du matériel courant. Règles, illustrations et éléments protégés sont recréés ; le jeu original est toujours cité. Ce projet n'est pas un substitut — il encourage à découvrir les œuvres de leurs auteurs.
+                    
                 </p>
             </div>
         </div>
@@ -431,7 +450,22 @@
                     <i class="fa-solid fa-circle-question"></i>
                 </div>
                 <p class="text-slate-600 font-medium leading-relaxed">
-                    TATATATATAT
+
+Filtres joueurs
+
+Sélectionne une ou plusieurs configurations. Les jeux idéaux pour toutes tes sélections apparaissent en premier, puis ceux idéaux pour l'une d'elles, puis les compatibles.
+Matériel
+
+Mini — 1 jeu de 52 cartes, papier, stylo
+Standard — 2 jeux, jetons, dés, quelques pages imprimées réutilisables (inclut Mini)
+Maxi — matériel additionnel ou spécial (inclut Standard)
+
+Flash — rapide à expliquer et à jouer · Fav — mes coups de cœur · New — ajouts du mois
+Recherche textuelle
+
+Titre original, auteur, date, titre de l'adaptation, catégorie BGG, matériel, mécanique…
+Ex : "party", "dés", "plis", "Reiner", "2019", "coopératif"
+                    
                 </p>
             </div>
         </div>
