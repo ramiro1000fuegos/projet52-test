@@ -421,7 +421,7 @@ createApp({
                 const matchNew = this.filters.onlyNew ? game.isNew : true;
                 const matchHeart = this.filters.onlyHeart ? game.heart : true;
                 const matchFlash = this.filters.onlyFlash ? game.isFlash : true;
-                return matchPlayer && matchAge && matchMaterial && matchFlash; //&& matchTime && matchCats && matchNew && matchHeart;
+                return matchPlayer && matchAge && matchMaterial && matchFlash && matchNew && matchHeart;
             }).sort((a, b) => {
                // A. Contamos solo los verdes (🟢) para la selección actual
                 const getGreenCount = (game) => {
