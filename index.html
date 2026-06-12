@@ -262,7 +262,7 @@
                             <button @click="filters.onlyNew = !filters.onlyNew" 
                                     :class="filters.onlyNew ? 'btn-player-active' : 'btn-player-inactive'"
                                     class="btn-player w-full flex items-center justify-center py-2 h-[34px]">
-                                <i class="fa-solid fa-sparkles"></i>
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
                             </button>                        
                         </div>
                         
@@ -285,7 +285,7 @@
                     <div class="flex-1">
                         <h2 class="text-lg font-black text-slate-900 leading-tight uppercase">{{ game.name }} 
                         <span v-if="game.heart">❤️</span> 
-                        <span v-if="game.isNew">✨</span> 
+                        <span v-if="game.isNew">🪄</span> 
                         <span v-if="game.isFlash">⚡</span>                            
                         </h2>
                         <p class="text-s text-slate-300 font-bold mt-1 uppercase">{{ game.origin }}</p>
