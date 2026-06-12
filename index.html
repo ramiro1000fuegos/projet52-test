@@ -132,21 +132,37 @@
             background-color: #cbd5e1; /* Slate 300 */
             color: #1e293b;            /* Slate 800: texto un poco más oscuro */ 
         }
-
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.7); /* Slate 900 opaco */
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
         .modal-content {
             background-color: white;
             border-radius: 2rem;
             padding: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            max-width: 24rem; /* max-w-sm */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 28rem;
             width: 100%;
             position: relative;
-            text-align: center;
-            
-            /* SEGURIDAD PARA TEXTOS LARGOS */
-            max-height: 85vh;    /* Altura máxima: 85% de la pantalla */
-            overflow-y: auto;    /* Si el texto sobra, aparece un scroll interno */
-        }        
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .modal-content h3 { @apply font-black uppercase text-indigo-600 mb-2 mt-4 text-xs tracking-widest; }
+        .modal-content p { @apply text-slate-600 text-sm leading-relaxed mb-3; }
+        .modal-content b { @apply text-slate-900 font-bold; }
         
     </style>
 </head>
@@ -423,57 +439,50 @@
         </div>
     </div>
 
-<!-- Popups (Modals) -->
-    <teleport to="body">
-        <!-- Popup Info (i) -->
-        <div v-if="showInfoPopup" class="modal-overlay" @click.self="showInfoPopup = false">
-            <div class="modal-content">
-                <button @click="showInfoPopup = false" class="absolute top-4 right-6 text-slate-300 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-                <div class="text-indigo-600 text-4xl mb-4 text-center">
-                    <i class="fa-solid fa-circle-info"></i>
-                </div>
-                <p class="text-slate-600 font-medium leading-relaxed">
+    <!-- Popups (Modals) -->
+    <!-- POPUP AYUDA (?) -->
+    <div v-if="showHelpPopup" class="modal-overlay" @click.self="showHelpPopup = false">
+        <div class="modal-content animate-fade-in">
+            <button @click="showHelpPopup = false" class="absolute top-4 right-6 text-slate-400 hover:text-slate-900">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <h2 class="text-xl font-black text-slate-900 uppercase tracking-tighter mb-4">Aide & Filtres</h2>
 
-À propos des adaptations
+            <h3>Filtres joueurs</h3>
+            <p>Sélectionnez une ou plusieurs configurations. Les jeux idéaux pour toutes tes sélections apparaissent en premier, puis ceux idéaux pour l'une d'elles, puis les compatibles.</p>
 
-La plupart des jeux sont des adaptations de titres publiés, rendues jouables avec du matériel courant. Règles, illustrations et éléments protégés sont recréés ; le jeu original est toujours cité. Ce projet n'est pas un substitut — il encourage à découvrir les œuvres de leurs auteurs.
-                    
-                </p>
-            </div>
+            <h3>Matériel</h3>
+            <p><b>Mini</b> = 1 jeu de 52 cartes, papier, stylo</p>
+            <p><b>Standard</b> = 2 jeux, jetons, dés, quelques pages imprimées réutilisables (inclut Mini)</p>
+            <p><b>Maxi</b> = matériel additionnel ou spécial (inclut Standard)</p>
+
+            <h3>Icônes</h3>
+            <p><b>Flash</b> = rapide à expliquer et à jouer</p>
+            <p><b>Fav</b> = mes coups de cœur</p>
+            <p><b>New</b> = ajouts du mois</p>
+
+            <h3>Recherche textuelle</h3>
+            <p>Utilisez-la pour chercher le titre original, l'auteur, la date de publication, le titre de l'adaptation, la catégorie BGG, le matériel utilisé, une mécanique…</p>
+            <p class="bg-slate-50 p-3 rounded-xl border border-slate-100 italic text-xs">
+                Ex : "party", "dés", "plis", "Knizia", "2019", "coopératif"
+            </p>
         </div>
+    </div>
 
-        <!-- Popup Aide (?) -->
-        <div v-if="showHelpPopup" class="modal-overlay" @click.self="showHelpPopup = false">
-            <div class="modal-content">
-                <button @click="showHelpPopup = false" class="absolute top-4 right-6 text-slate-300 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-                <div class="text-indigo-600 text-4xl mb-4 text-center">
-                    <i class="fa-solid fa-circle-question"></i>
-                </div>
-                <p class="text-slate-600 font-medium leading-relaxed">
+    <!-- POPUP INFO (i) -->
+    <div v-if="showInfoPopup" class="modal-overlay" @click.self="showInfoPopup = false">
+        <div class="modal-content animate-fade-in">
+            <button @click="showInfoPopup = false" class="absolute top-4 right-6 text-slate-400 hover:text-slate-900">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
 
-Filtres joueurs
-
-Sélectionne une ou plusieurs configurations. Les jeux idéaux pour toutes tes sélections apparaissent en premier, puis ceux idéaux pour l'une d'elles, puis les compatibles.
-Matériel
-
-Mini — 1 jeu de 52 cartes, papier, stylo
-Standard — 2 jeux, jetons, dés, quelques pages imprimées réutilisables (inclut Mini)
-Maxi — matériel additionnel ou spécial (inclut Standard)
-
-Flash — rapide à expliquer et à jouer · Fav — mes coups de cœur · New — ajouts du mois
-Recherche textuelle
-
-Titre original, auteur, date, titre de l'adaptation, catégorie BGG, matériel, mécanique…
-Ex : "party", "dés", "plis", "Reiner", "2019", "coopératif"
-                    
-                </p>
-            </div>
+            <h2 class="text-xl font-black text-slate-900 uppercase tracking-tighter mb-4">À propos des adaptations</h2>
+            <p>La plupart des jeux sont des adaptations de titres publiés, rendues jouables avec du matériel courant.</p>
+            <p>Règles, illustrations et éléments protégés sont recréés ; le jeu original est toujours cité.</p>
+            <p class="font-bold text-indigo-600">Ce projet n'est pas un substitut — il encourage à découvrir les œuvres de leurs auteurs.</p>
         </div>
-    </teleport>
+    </div>
     
 </div>
 
