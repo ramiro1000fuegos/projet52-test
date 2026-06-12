@@ -13,15 +13,19 @@
     <style>
         [v-cloak] { display: none; }
         /* Botones de Jugadores */
-        .btn-player { border: 2px solid #e2e8f0; transition: all 0.2s; font-weight: bold; border-radius: 0.75rem; text-align: center; padding: 0.5rem 0; font-size: 0.875rem; cursor: pointer; }
+        .btn-player { 
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s; 
+            font-weight: bold; 
+            border-radius: 0.75rem; 
+            text-align: center; 
+            padding: 0.5rem 0; 
+            font-size: 0.875rem; 
+            cursor: pointer; 
+        }
         .btn-player-active { background-color: #1e1b4b; border-color: #1e1b4b; color: white; }
         .btn-player-inactive { background-color: white; color: #64748b; }
-        .btn-player-inactive:hover { border-color: #444444}
-
-        /* Botones de Categorías y RFK */
-        .btn-cat { border: 2px solid #f1f5f9; transition: all 0.2s; font-weight: 900; font-size: 10px; text-transform: uppercase; padding: 0.6rem 0.75rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; cursor: pointer; }
-        .btn-cat-active { background-color: #1e1b4b; border-color: #1e1b4b; color: white; }
-        .btn-cat-inactive { background-color: white; color: #94a3b8; border-color: #f1f5f9; }
+        .btn-player-inactive:hover { border-color: #444444 }
 
         .attr-pill {
             display: inline-flex;
@@ -51,7 +55,7 @@
             color: #312e81;     /* Indigo 900: Azul casi negro */
             background-color: #eff6ff; /* Azul muy muy claro */
         }        
-        /*.cat-pill { @apply border border-indigo-100 px-2 py-0.5 rounded-full text-[9px] font-black uppercase text-indigo-400 bg-indigo-50/50 flex items-center gap-1; }*/
+
         .section-card { @apply bg-white p-6 md:p-8 rounded-[2.5rem] shadow-xl border border-slate-200 mb-8; }
         .animate-fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { 
@@ -84,7 +88,6 @@
             font-size: 1.4rem;
             font-weight: 800;                        
         }
-        
         .btn-corner:hover {
             border-color: #cbd5e1;
             color: #6366f1;
@@ -361,8 +364,8 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2 mb-2">
-                    <div class="attr-pill"><i class="fa-solid fa-users text-indigo-300"></i> {{ game.nbPersonnes }}</div>
-                    <div class="attr-pill"><i class="fa-solid fa-cake-candles text-indigo-300"></i> {{ game.ageMin }}+</div>
+                    <div class=""><i class="fa-solid fa-users text-indigo-300"></i> {{ game.nbPersonnes }}</div>
+                    <div class=""><i class="fa-solid fa-cake-candles text-indigo-300"></i> {{ game.ageMin }}+</div>
                     <div class="attr-pill"><i class="fa-solid fa-box text-indigo-300"></i> {{ game.config }}</div>
                 </div>
 
