@@ -210,10 +210,10 @@
                 
                 <!-- Autres Filtres: Mitad de ancho en móvil (col-span-1) --> 
                 <!-- Fila de filtros: Material (3/9), Edad (3/9), Flash (1/9), Fav (1/9), New (1/9) -->
-                <div class="col-span-2 md:col-span-7 grid grid-cols-9 gap-3">
+                <div class="col-span-2 md:col-span-7 grid grid-cols-17 gap-3">
 
                     <!-- Âge (3 de 9) -->
-                    <div class="col-span-3">                
+                    <div class="col-span-4">                
                         <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Âge</h3>
                         <select v-model="filters.age" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
                             <option :value="99">Sans limite</option>
@@ -222,7 +222,7 @@
                     </div>
                     
                     <!-- Material (3 de 9) -->
-                    <div class="col-span-3">
+                    <div class="col-span-4">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Matériel</h3>
                         </div>
@@ -234,7 +234,7 @@
                     </div>
 
                      <!-- Botón Flash 52 (1 de 9) -->
-                    <div class="col-span-1 flex flex-col">
+                    <div class="col-span-3 flex flex-col">
                         <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Flash</h3>
                         <button @click="filters.onlyFlash = !filters.onlyFlash" 
                                 :class="filters.onlyFlash ? 'btn-player-active' : 'btn-player-inactive'"
@@ -244,7 +244,7 @@
                     </div>
 
                      <!-- Botón Coeur (1 de 9) -->
-                    <div class="col-span-1 flex flex-col">
+                    <div class="col-span-3 flex flex-col">
                         <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Fav</h3>
                         <button @click="filters.onlyHeart = !filters.onlyHeart" 
                                 :class="filters.onlyHeart ? 'btn-player-active' : 'btn-player-inactive'"
@@ -254,7 +254,7 @@
                     </div>
 
                      <!-- Botón New (1 de 9) -->
-                    <div class="col-span-1 flex flex-col">
+                    <div class="col-span-3 flex flex-col">
                         <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">New</h3>
                         <button @click="filters.onlyNew = !filters.onlyNew" 
                                 :class="filters.onlyNew ? 'btn-player-active' : 'btn-player-inactive'"
