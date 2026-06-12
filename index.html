@@ -547,15 +547,6 @@ createApp({
                                 ...this.getLabels(rawLabels)
                             ];
                             
-                            const allTerms = new Set();
-                            this.games.forEach(g => {
-                                if (g.name) allTerms.add(g.name);
-                                if (g.author) allTerms.add(g.author);
-                                // Opcional: añadir también los labels individuales al diccionario
-                                if (g.labels) g.labels.forEach(l => allTerms.add(l));
-                            });
-                            this.searchDictionary = Array.from(allTerms);
-                            
                             return {
                                 id: index, name: row.Nom_Adaptation, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
                                 author: author, labels: gameLabels,
@@ -571,6 +562,16 @@ createApp({
                                 players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG }
                             }
                         });
+
+                        const allTerms = new Set();
+                        this.games.forEach(g => {
+                            if (g.name) allTerms.add(g.name);
+                            if (g.author) allTerms.add(g.author);
+                            // Opcional: añadir también los labels individuales al diccionario
+                            if (g.labels) g.labels.forEach(l => allTerms.add(l));
+                        });
+                        this.searchDictionary = Array.from(allTerms);                        
+                        
                         this.loading = false;
                     }
                 });
