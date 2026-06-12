@@ -198,10 +198,20 @@
                 </div>
                 
                 <!-- Autres Filtres: Mitad de ancho en móvil (col-span-1) --> 
-                <!-- Fila de filtros Material (2/5), Edad (2/5) y Flash (1/5) -->
-                <div class="col-span-2 md:col-span-7 grid grid-cols-5 gap-3">
-                    <!-- Material (2 de 5) -->
-                    <div class="col-span-2">
+                <!-- Fila de filtros: Material (3/9), Edad (3/9), Flash (1/9), Fav (1/9), New (1/9) -->
+                <div class="col-span-2 md:col-span-7 grid grid-cols-9 gap-3">
+
+                    <!-- Âge (3 de 9) -->
+                    <div class="col-span-3">                
+                        <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Âge</h3>
+                        <select v-model="filters.age" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
+                            <option :value="99">Sans limite</option>
+                            <option v-for="a in [12,10,8,6]" :value="a">{{a}}-{{a+1}} ans</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Material (3 de 9) -->
+                    <div class="col-span-3">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Matériel</h3>
                         </div>
@@ -211,15 +221,8 @@
                             <option value="1">Mini</option>
                         </select>
                     </div>
-                    <!-- Âge (2 de 5) -->
-                    <div class="col-span-2">                
-                        <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Âge</h3>
-                        <select v-model="filters.age" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
-                            <option :value="99">Sans limite</option>
-                            <option v-for="a in [12,10,8,6]" :value="a">{{a}}-{{a+1}} ans</option>
-                        </select>
-                    </div>
-                     <!-- Botón Flash 52 (1 de 5) -->
+
+                     <!-- Botón Flash 52 (1 de 9) -->
                     <div class="col-span-1 flex flex-col">
                         <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Flash</h3>
                         <button @click="filters.onlyFlash = !filters.onlyFlash" 
@@ -228,6 +231,27 @@
                             <i class="fa-solid fa-bolt"></i>
                         </button>                        
                     </div>
+
+                     <!-- Botón Coeur (1 de 9) -->
+                    <div class="col-span-1 flex flex-col">
+                        <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">Fav</h3>
+                        <button @click="filters.onlyHeart = !filters.onlyHeart" 
+                                :class="filters.onlyHeart ? 'btn-player-active' : 'btn-player-inactive'"
+                                class="btn-player w-full flex items-center justify-center py-2">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>                        
+                    </div>
+
+                     <!-- Botón New (1 de 9) -->
+                    <div class="col-span-1 flex flex-col">
+                        <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-widest">New</h3>
+                        <button @click="filters.onlyNew = !filters.onlyNew" 
+                                :class="filters.onlyNew ? 'btn-player-active' : 'btn-player-inactive'"
+                                class="btn-player w-full flex items-center justify-center py-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>                        
+                    </div>
+                    
                 </div>
             </div>
         </section>
@@ -379,11 +403,8 @@ createApp({
                 const matchAge = game.ageMin <= this.filters.age;
                 const configRank = { 'Mini': 1, 'Standard': 2, 'Maxi': 3 };
                 const matchMaterial = game.configLevel <= this.filters.material;
-                //const timeRank = { '1-Express': 1, '2-Courant': 2, '3-Long': 3 };
-                //const matchTime = timeRank[game.timeStart] <= timeRank[this.filters.time];
-                //const matchCats = this.filters.cats.length === 0 || this.filters.cats.some(c => game.catBGG[c]);
-                //const matchNew = this.filters.onlyNew ? game.isNew : true;
-                //const matchHeart = this.filters.onlyHeart ? game.heart : true;
+                const matchNew = this.filters.onlyNew ? game.isNew : true;
+                const matchHeart = this.filters.onlyHeart ? game.heart : true;
                 const matchFlash = this.filters.onlyFlash ? game.isFlash : true;
                 return matchPlayer && matchAge && matchMaterial && matchFlash; //&& matchTime && matchCats && matchNew && matchHeart;
             }).sort((a, b) => {
