@@ -379,6 +379,39 @@
         </div>
     </div>
 
+<!-- Popups (Modals) -->
+    <teleport to="body">
+        <!-- Popup Info (i) -->
+        <div v-if="showInfoPopup" class="modal-overlay" @click.self="showInfoPopup = false">
+            <div class="modal-content">
+                <button @click="showInfoPopup = false" class="absolute top-4 right-6 text-slate-300 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <div class="text-indigo-600 text-4xl mb-4 text-center">
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+                <p class="text-slate-600 font-medium leading-relaxed">
+                    tOTOTOTOTOTOTO
+                </p>
+            </div>
+        </div>
+
+        <!-- Popup Aide (?) -->
+        <div v-if="showHelpPopup" class="modal-overlay" @click.self="showHelpPopup = false">
+            <div class="modal-content">
+                <button @click="showHelpPopup = false" class="absolute top-4 right-6 text-slate-300 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <div class="text-indigo-600 text-4xl mb-4 text-center">
+                    <i class="fa-solid fa-circle-question"></i>
+                </div>
+                <p class="text-slate-600 font-medium leading-relaxed">
+                    TATATATATAT
+                </p>
+            </div>
+        </div>
+    </teleport>
+    
 </div>
 
 <script>
