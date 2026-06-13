@@ -180,7 +180,59 @@
             max-height: 85vh;
             overflow-y: auto;
         }
-       
+
+        /* Contenedor del Tooltip */
+        .has-tooltip {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+        
+        /* La burbuja de texto */
+        .tooltip-text {
+            visibility: hidden;
+            position: absolute;
+            bottom: 110%; /* Aparece arriba del botón */
+            background-color: #1e293b; /* Slate 800 */
+            color: #ffffff;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            transform: translateY(5px);
+            pointer-events: none; /* Para que no interfiera con el clic */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Triángulo del tooltip */
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+        
+        /* Mostrar al hacer Hover */
+        .has-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Asegurar cursor de mano en todos los controles */
+        button, select, .game-card {
+            cursor: pointer;
+        }
+        
     </style>
 </head>
 
@@ -335,11 +387,14 @@
                         <h3 class="text-xs font-black uppercase text-slate-400 text-center tracking-widest  mb-1">Priorité</h3>
                         <div class="grid grid-cols-3 gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
                             <!-- Botón Flash -->
-                            <button @click="toggleSortMode('flash')" 
-                                    :class="filters.activeSortMode === 'flash' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
-                                    class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
-                                <i class="fa-solid fa-bolt text-[10px]"></i>
-                            </button>
+                            <div class="has-tooltip">
+                                <button @click="toggleSortMode('flash')" 
+                                        :class="filters.activeSortMode === 'flash' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
+                                        class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
+                                    <i class="fa-solid fa-bolt text-[10px]"></i>
+                                </button>
+                                <span class="tooltip-text">Démarrage rapide</span>
+                            </div>
                             <!-- Botón Fav -->
                             <button @click="toggleSortMode('fav')" 
                                     :class="filters.activeSortMode === 'fav' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
