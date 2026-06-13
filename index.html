@@ -584,6 +584,23 @@
         </div>
     </div>
     
+    <div v-if="showCommentModal" class="modal-overlay" @click.self="showCommentModal = false">
+        <div class="modal-content">
+            <h2 class="text-xl font-black uppercase mb-4">Feedback : {{ activeFeedbackGame || 'Site' }}</h2>
+            <textarea v-model="commentText" 
+                      placeholder="Qu'est-ce qui ne va pas ? Une erreur de règle, un lien mort..."
+                      class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm mb-4 h-32 focus:border-indigo-500 outline-none"></textarea>
+            <div class="flex gap-2">
+                <button @click="showCommentModal = false" class="btn-bgg flex-1 py-3 rounded-xl uppercase font-bold">Annuler</button>
+                <button @click="sendFeedback(activeFeedbackGame || 'SITE', 'COMMENT', commentText)" 
+                        :disabled="!commentText || isSending"
+                        class="btn-mobile flex-1 py-3 rounded-xl uppercase font-bold disabled:opacity-50">
+                    {{ isSending ? 'Envoi...' : 'Envoyer' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    
 </div>
 
 <!-- ############################################################################################################################################## -->
