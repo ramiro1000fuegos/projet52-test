@@ -646,8 +646,8 @@ createApp({
         }
     },
     mounted() { 
-        this.fetchData(); 
         localStorage.setItem('rkf_user_id', this.visitorId);
+        this.fetchData(); 
     },
     computed: {
         filteredGames() {
