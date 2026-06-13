@@ -154,6 +154,27 @@
             color: #1e293b;            /* Slate 800: texto un poco más oscuro */ 
         }
         
+        .check-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background-color: #fbfcfd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .check-card:hover { border-color: #6366f1; background-color: #f5f7ff; }
+        .check-card input {
+            width: 18px;
+            height: 18px;
+            accent-color: #1e1b4b;
+            margin-top: 2px;
+        }
+        .check-card span { font-size: 13px; color: #475569; line-height: 1.3; font-weight: 500; }
+        
+        
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -475,27 +496,32 @@
                 <div v-if="expandedId === game.id" class="mt-3 pt-3 space-y-4 animate-fade-in">
 
                     <!-- Feedback -->
-                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
-                        <div class="flex gap-4">
-                            <!-- Votos -->
-                            <div class="flex gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
-                                <button @click.stop="sendFeedback(game.name, 'VOTE', 1)" class="hover:text-green-600 px-2 transition-colors">
-                                    <i class="fa-regular fa-thumbs-up"></i>
-                                </button>
-                                <button @click.stop="sendFeedback(game.name, 'VOTE', -1)" class="hover:text-red-600 px-2 transition-colors">
-                                    <i class="fa-regular fa-thumbs-down"></i>
+                    <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
+                        <!-- Bloque de Votación -->
+                        <div class="flex flex-col gap-2">
+                            <span class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Voter l'adaptation</span>
+                            <div class="flex gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                                <button v-for="(emoji, val) in {1:'😞', 2:'😐', 3:'🙂', 4:'😍'}" 
+                                        @click.stop="handleVote(game.name, parseInt(val))"
+                                        class="text-xl transition-all hover:scale-125"
+                                        :class="userVotes[game.name] == val ? 'grayscale-0 opacity-100' : 'grayscale opacity-30 hover:opacity-100'">
+                                    {{ emoji }}
                                 </button>
                             </div>
                         </div>
-                        
-                        <!-- Botón avisar error -->
-                        <button @click.stop="activeFeedbackGame = game.name; showCommentModal = true" 
-                                class="text-[10px] font-bold text-slate-400 hover:text-indigo-600 flex items-center gap-1">
-                            <i class="fa-solid fa-circle-exclamation"></i> Signaler un problème
-                        </button>
-                    </div>
-
                     
+                        <!-- Bloque de Resultados de Comunidad -->
+                        <div class="text-right flex flex-col items-end">
+                            <div v-if="game.communityCount >= 5" class="bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100">
+                                <span class="text-xs font-black text-indigo-900">{{ game.communityAvg }} / 4</span>
+                                <p class="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter">Note communauté</p>
+                            </div>
+                            <div v-else class="text-slate-300">
+                                <p class="text-[9px] font-bold uppercase">{{ game.communityCount }} votes</p>
+                                <p class="text-[7px] italic leading-none">Moyenne à 5 votes</p>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Bloque Fidelidad (dentro de la ficha expandida) -->
                     <div class="fidelity-box">
@@ -583,7 +609,47 @@
             <p class="mt-4">Ce projet n'est pas un substitut: il encourage à découvrir les œuvres de leurs auteurs.</p>
         </div>
     </div>
+
+    <div v-if="showFeedbackModal" class="modal-overlay" @click.self="showFeedbackModal = false">
+        <div class="modal-content">
+            <h2 class="text-xl font-black uppercase text-slate-900 mb-2 text-center">Aidez-nous à améliorer</h2>
+            <p class="text-xs text-rose-600 font-bold mb-6 text-center uppercase tracking-tighter">Qu'est-ce qui ne vous a pas convaincu ?</p>
+            
+            <div class="space-y-2 mb-6">
+                <!-- Usamos keys para mapear a las columnas del Excel -->
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.material">
+                    <span>Matériel peu pratique à manipuler</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.prep">
+                    <span>Préparation trop longue ou fastidieuse</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.rules">
+                    <span>Règles confuses ou incomplètes</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.exp">
+                    <span>L'adaptation dénature l’esprit du jeu original</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.game">
+                    <span>Simple question de goût (le jeu ne m’a pas plu)</span>
+                </label>
+            </div>
     
+            <textarea v-model="currentFeedback.comment" placeholder="Plus de détails (facultatif)..." 
+                      class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm mb-4 h-24 outline-none focus:border-indigo-500"></textarea>
+    
+            <button @click="submitDetailedFeedback" :disabled="isSending"
+                    class="btn-mobile w-full py-4 rounded-2xl uppercase font-black tracking-widest shadow-lg disabled:opacity-50">
+                {{ isSending ? 'Envoi...' : 'Envoyer' }}
+            </button>
+        </div>
+    </div>
+    
+<!--
     <div v-if="showCommentModal" class="modal-overlay" @click.self="showCommentModal = false">
         <div class="modal-content">
             <h2 class="text-xl font-black uppercase mb-4">Feedback : {{ activeFeedbackGame || 'Site' }}</h2>
@@ -600,6 +666,7 @@
             </div>
         </div>
     </div>
+-->
     
 </div>
 
@@ -633,12 +700,26 @@ createApp({
                 { name: "Abstrait", label: "Abstrait", icon: "fa-solid fa-chess-board" },
                 { name: "Stratégie", label: "Stratégie", icon: "fa-solid fa-gears" }
             ],
+            showFeedbackModal: false,
+            isSending: false,
+            // Estructura de issues por clave para el mapeo a columnas
+            currentFeedback: { 
+                gameId: null, 
+                rating: null, 
+                issues: { material: false, prep: false, rules: false, exp: false, game: false }, 
+                comment: '' 
+            },            
             filters: {
                 age: 99, 
                 material: 3, 
                 activeSortMode: 'default', // 'default', 'new', 'fav', 'flash'
             },
+            
+            // Recuperamos el ID del usuario o creamos uno nuevo
             visitorId: localStorage.getItem('rkf_user_id') || 'user_' + Math.random().toString(36).substr(2, 9),
+            // Recuperamos sus votos anteriores para iluminar los emojis
+            userVotes: JSON.parse(localStorage.getItem('rkf_user_votes') || '{}'),
+            
             showCommentModal: false,
             activeFeedbackGame: null,
             commentText: '',
@@ -824,70 +905,113 @@ createApp({
             }
         },        
         async fetchData() {
-            const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv";
+            const URL_JUEGOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv";
+            const URL_VOTOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLzY0YREy8dl8jWKwb94f_l8HNOGnMKcJcxsNjzaR0B3Awc3Nkgf4yvj-ncnL9ei7Wvm7_VaztaV63/pub?gid=684535740&single=true&output=csv";
+
             try {
-                const response = await fetch(URL);
-                const csvText = await response.text();
-                Papa.parse(csvText, {
-                    header: true, skipEmptyLines: true,
-                    complete: (results) => {
-                        this.games = results.data.filter(row => row.Nom_Adaptation).map((row, index) => {
-                            const author = row.Auteur || "";
-                            const rawLabels = row.Labels || "";
-                        
-                            // Construimos el ADN del juego: una lista de todas sus etiquetas posibles
-                            const gameLabels = [
-                                ...this.getLabels(row.Nom_Adaptation),
-                                ...this.getLabels(row.Jeu_Origine),
-                                ...this.getLabels(author),
-                                ...this.getLabels(rawLabels)
-                            ];                            
-                            return {
-                                id: index, name: row.Nom_Adaptation, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
-                                author: author, labels: gameLabels,
-                                configLevel: row.Config_materiel ? (parseInt(row.Config_materiel.charAt(0)) || 3) : 3,
-                                config: row.Config_materiel ? (row.Config_materiel.includes('-') ? row.Config_materiel.split('-')[1] : row.Config_materiel) : 'Maxi',
-                                nbPersonnes: row.Nb_personnes, timeStart: row.Temps_avant_demarrage || '3-Long', rankingBGG: row.Ranking_BGG || 'N/A',
-                                scoreRKF: parseFloat(row.Note_RKF) || 5,
-                                isFlash: row.Flash52 !== "",
-                                isNew: row.New !== "", heart: row.Favori !== "", 
-                                dateAdded: row.Date_Publication ? new Date(row.Date_Publication) : new Date("1900-01-01"),
-                                fidelityScore: this.parseFidelity(row.Fidelite),
-                                fidelityDetails: row.Details_Fidelite, catBGG: { Famille: row.Famille !== "", Party: row.Party !== "", Abstrait: row.Abstrait !== "", Stratégie: row.Stratégie !== "" },
-                                players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG }
-                            }
-                        });
-                        this.loading = false;
-                    }
-                });
+
+                    // 1. Cargamos las medias de la comunidad
+                    const resVotos = await fetch(URL_VOTOS);
+                    const csvVotos = await resVotos.text();
+                    const statsComunidad = {};
+                    
+                    Papa.parse(csvVotos, {
+                        header: true,
+                        complete: (results) => {
+                            results.data.forEach(row => {
+                                statsComunidad[row.Col2] = { // Col2 es el GameID
+                                    avg: parseFloat(row.Media).toFixed(1),
+                                    count: parseInt(row.Total)
+                                };
+                            });
+                        }
+                    });
+                
+                    // 2. Cargamos los juegos y les inyectamos su media            
+                    const response = await fetch(URL_JUEGOS);
+                    const csvText = await response.text();
+                    Papa.parse(csvText, {
+                        header: true, skipEmptyLines: true,
+                        complete: (results) => {
+                            this.games = results.data.filter(row => row.Nom_Adaptation).map((row, index) => {
+                                const author = row.Auteur || "";
+                                const rawLabels = row.Labels || "";
+                            
+                                // Construimos el ADN del juego: una lista de todas sus etiquetas posibles
+                                const gameLabels = [
+                                    ...this.getLabels(row.Nom_Adaptation),
+                                    ...this.getLabels(row.Jeu_Origine),
+                                    ...this.getLabels(author),
+                                    ...this.getLabels(rawLabels)
+                                ]; 
+
+                                const gameName = row.Nom_Adaptation;
+                                return {
+                                    id: index, name: gameName, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
+                                    author: author, labels: gameLabels,
+                                    // Inyectamos los datos de comunidad calculados arriba
+                                    communityAvg: statsComunidad[gameName]?.avg || "0.0",
+                                    communityCount: statsComunidad[gameName]?.count || 0,                                    
+                                    configLevel: row.Config_materiel ? (parseInt(row.Config_materiel.charAt(0)) || 3) : 3,
+                                    config: row.Config_materiel ? (row.Config_materiel.includes('-') ? row.Config_materiel.split('-')[1] : row.Config_materiel) : 'Maxi',
+                                    nbPersonnes: row.Nb_personnes, timeStart: row.Temps_avant_demarrage || '3-Long', rankingBGG: row.Ranking_BGG || 'N/A',
+                                    scoreRKF: parseFloat(row.Note_RKF) || 5,
+                                    isFlash: row.Flash52 !== "",
+                                    isNew: row.New !== "", heart: row.Favori !== "", 
+                                    dateAdded: row.Date_Publication ? new Date(row.Date_Publication) : new Date("1900-01-01"),
+                                    fidelityScore: this.parseFidelity(row.Fidelite),
+                                    fidelityDetails: row.Details_Fidelite, catBGG: { Famille: row.Famille !== "", Party: row.Party !== "", Abstrait: row.Abstrait !== "", Stratégie: row.Stratégie !== "" },
+                                    players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG }
+                                }
+                            });
+                            this.loading = false;
+                        }
+                    });
+                
             } catch(e) { alert("Erreur de synchronisation."); this.loading = false; }
         },
-        async sendFeedback(gameId, type, value) {
-            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5mbnvGqu7OiamO100VaCOP2McaS1SaXdZvtnPwXSzPrLe5kvn_8Uax6-e2-LrS9m-/exec";
-            this.isSending = true;
+
+        async handleVote(gameId, val) {
+            // Resetear formulario
+            this.currentFeedback = { 
+                gameId: gameId, 
+                rating: val, 
+                issues: { material: false, prep: false, rules: false, exp: false, game: false }, 
+                comment: '' 
+            };
             
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Necesario para Google Apps Script
-                    body: JSON.stringify({
-                        userId: this.visitorId,
-                        gameId: gameId,
-                        type: type,
-                        value: value
-                    })
-                });
-                if (type === 'COMMENT') {
-                    alert("Merci ! Votre message a été envoyé.");
-                    this.showCommentModal = false;
-                    this.commentText = '';
-                }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                this.isSending = false;
+            if (val === 4) { // 😍 Parfaite
+                await this.sendToGoogle(this.currentFeedback);
+                this.saveLocalVote(gameId, val);
+                alert("Merci ! Votre vote a été enregistré.");
+            } else {
+                this.showFeedbackModal = true;
             }
         },
+        
+        async submitDetailedFeedback() {
+            this.isSending = true;
+            await this.sendToGoogle(this.currentFeedback);
+            this.saveLocalVote(this.currentFeedback.gameId, this.currentFeedback.rating);
+            this.isSending = false;
+            alert("Merci ! Votre retour nous aide à améliorer l'adaptation.");
+            this.showFeedbackModal = false;
+        },
+        
+        async sendToGoogle(payload) {
+            const URL = "https://script.google.com/macros/s/AKfycbw5mbnvGqu7OiamO100VaCOP2McaS1SaXdZvtnPwXSzPrLe5kvn_8Uax6-e2-LrS9m-/exec";
+            try {
+                await fetch(URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        userId: this.visitorId,
+                        ...payload
+                    })
+                });
+            } catch (e) { console.error("Error envío:", e); }
+        }        
+        
         extractPlayers(row) { let p = {}; for (let i = 1; i <= 21; i++) { if (row[i.toString()]) p[i] = row[i.toString()]; } return p; },
         parseFidelity(text) { if (!text) return 0; if (text.includes("4")) return 4; if (text.includes("3")) return 3; if (text.includes("2")) return 2; return 1; },
         togglePlayer(n) { const i = this.selectedPlayers.indexOf(n); if (i > -1) this.selectedPlayers.splice(i, 1); else this.selectedPlayers.push(n); },
