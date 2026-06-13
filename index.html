@@ -973,6 +973,10 @@ createApp({
         },
         
         async handleVote(gameId, val) {
+
+            const oldRating = this.userVotes[gameId];
+            if (oldRating === val) return; // Si vota lo mismo, no hacemos nada            
+            
             // Resetear formulario
             this.currentFeedback = { 
                 gameId: gameId, 
@@ -982,8 +986,9 @@ createApp({
             };
             
             if (val === 4) { // 😍 Parfaite
+                this.updateLocalStats(gameId, val); // <--- Recalcular ahora
+                this.saveLocalVote(gameId, val);    // <--- Guardar emoji
                 await this.sendToGoogle(this.currentFeedback);
-                this.saveLocalVote(gameId, val);
             } else {
                 this.showFeedbackModal = true;
             }
@@ -991,8 +996,9 @@ createApp({
         
         async submitDetailedFeedback() {
             this.isSending = true;
+            this.updateLocalStats(this.currentFeedback.gameId, this.currentFeedback.rating);
+            this.saveLocalVote(this.currentFeedback.gameId, this.currentFeedback.rating);            
             await this.sendToGoogle(this.currentFeedback);
-            this.saveLocalVote(this.currentFeedback.gameId, this.currentFeedback.rating);
             this.isSending = false;
             this.showFeedbackModal = false;
         },
@@ -1016,6 +1022,35 @@ createApp({
                 console.error("Error al enviar a Google:", e);
             }
         },        
+
+        updateLocalStats(gameName, newRating) {
+            // 1. Buscamos el juego en nuestra lista local
+            const game = this.games.find(g => g.name === gameName);
+            if (!game) return;
+        
+            // 2. Miramos si el usuario ya había votado antes por este juego
+            const oldRating = this.userVotes[gameName];
+        
+            // Convertimos los valores actuales a números para operar
+            let currentAvg = parseFloat(game.communityAvg) || 0;
+            let currentCount = parseInt(game.communityCount) || 0;
+            let totalScore = currentAvg * currentCount;
+        
+            if (oldRating) {
+                // CASO A: El usuario está CAMBIANDO su voto
+                // Restamos la nota vieja y sumamos la nueva. El contador no cambia.
+                totalScore = totalScore - oldRating + newRating;
+            } else {
+                // CASO B: El usuario está votando por PRIMERA VEZ
+                // Sumamos la nota y aumentamos el contador.
+                totalScore = totalScore + newRating;
+                currentCount++;
+            }
+        
+            // 3. Calculamos la nueva media y actualizamos el objeto
+            game.communityCount = currentCount;
+            game.communityAvg = currentCount > 0 ? (totalScore / currentCount).toFixed(1) : "0.0";
+        }
         
         extractPlayers(row) { let p = {}; for (let i = 1; i <= 21; i++) { if (row[i.toString()]) p[i] = row[i.toString()]; } return p; },
         parseFidelity(text) { if (!text) return 0; if (text.includes("4")) return 4; if (text.includes("3")) return 3; if (text.includes("2")) return 2; return 1; },
