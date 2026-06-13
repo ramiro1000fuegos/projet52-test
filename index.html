@@ -186,6 +186,7 @@
             position: relative;
             display: flex;
             justify-content: center;
+            width: 100%;
         }
         
         /* La burbuja de texto */
@@ -390,7 +391,7 @@
                             <div class="has-tooltip">
                                 <button @click="toggleSortMode('flash')" 
                                         :class="filters.activeSortMode === 'flash' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
-                                        class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
+                                        class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
                                     <i class="fa-solid fa-bolt text-[10px]"></i>
                                 </button>
                                 <span class="tooltip-text">Démarrage rapide</span>
@@ -399,7 +400,7 @@
                             <div class="has-tooltip">
                                 <button @click="toggleSortMode('fav')" 
                                         :class="filters.activeSortMode === 'fav' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
-                                        class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
+                                        class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
                                     <i class="fa-solid fa-heart text-[10px]"></i>
                                 </button>
                                 <span class="tooltip-text">Meilleures adaptations</span>
@@ -408,7 +409,7 @@
                             <div class="has-tooltip">
                                 <button @click="toggleSortMode('new')" 
                                         :class="filters.activeSortMode === 'new' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
-                                        class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
+                                        class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                                 </button>
                                 <span class="tooltip-text">Nouveautés</span>
