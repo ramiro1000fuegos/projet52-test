@@ -305,34 +305,34 @@
                
                     <!-- 3. Groupe de 3 Boutons (Flash, Fav, New) -->
                     <div class="grid grid-cols-3 gap-1"> <!-- gap-1 pour serrer les boutons -->
-
-                         <!-- Botón Flash 52 (1 de 9) -->
-                       <div class="flex flex-col">
-                            <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-tighter text-center">Flash</h3>
-                            <button @click="filters.onlyFlash = !filters.onlyFlash" 
-                                    :class="filters.onlyFlash ? 'btn-player-active' : 'btn-player-inactive'"
+                
+                        <!-- Vista Flash -->
+                        <div class="flex flex-col">
+                            <h3 class="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-tighter text-center leading-none">Flash</h3>
+                            <button @click="toggleSortMode('flash')" 
+                                    :class="filters.activeSortMode === 'flash' ? 'btn-player-active' : 'btn-player-inactive'"
                                     class="btn-player w-full flex items-center justify-center py-2 h-[34px]">
-                                <i class="fa-solid fa-bolt"></i>
+                                <i class="fa-solid fa-bolt text-[10px]"></i>
                             </button>                        
                         </div>
-                        
-                         <!-- Botón Coeur (1 de 9) -->
+                
+                        <!-- Vista Fav -->
                         <div class="flex flex-col">
-                            <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-tighter text-center">Fav</h3>
-                            <button @click="filters.onlyHeart = !filters.onlyHeart" 
-                                    :class="filters.onlyHeart ? 'btn-player-active' : 'btn-player-inactive'"
+                            <h3 class="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-tighter text-center leading-none">Fav</h3>
+                            <button @click="toggleSortMode('fav')" 
+                                    :class="filters.activeSortMode === 'fav' ? 'btn-player-active' : 'btn-player-inactive'"
                                     class="btn-player w-full flex items-center justify-center py-2 h-[34px]">
-                                <i class="fa-solid fa-heart"></i>
+                                <i class="fa-solid fa-heart text-[10px]"></i>
                             </button>                        
                         </div>
-    
-                         <!-- Botón New (1 de 9) -->
+                
+                        <!-- Vista New -->
                         <div class="flex flex-col">
-                            <h3 class="text-xs font-black uppercase text-slate-400 mb-2 tracking-tighter text-center">New</h3>
-                            <button @click="filters.onlyNew = !filters.onlyNew" 
-                                    :class="filters.onlyNew ? 'btn-player-active' : 'btn-player-inactive'"
+                            <h3 class="text-[8px] font-black uppercase text-slate-400 mb-1 tracking-tighter text-center leading-none">New</h3>
+                            <button @click="toggleSortMode('new')" 
+                                    :class="filters.activeSortMode === 'new' ? 'btn-player-active' : 'btn-player-inactive'"
                                     class="btn-player w-full flex items-center justify-center py-2 h-[34px]">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span class="text-[10px]">✨</span>
                             </button>                        
                         </div>
                         
@@ -505,7 +505,11 @@ createApp({
                 { name: "Abstrait", label: "Abstrait", icon: "fa-solid fa-chess-board" },
                 { name: "Stratégie", label: "Stratégie", icon: "fa-solid fa-gears" }
             ],
-            filters: { age: 99, material: 3, time: '3-Long', cats: [], onlyNew: false, onlyHeart: false, onlyFlash: false  }
+            filters: {
+                age: 99, 
+                material: 3, 
+                activeSortMode: 'default', // 'default', 'new', 'fav', 'flash'
+            }
         }
     },
     mounted() { this.fetchData(); },
@@ -531,12 +535,34 @@ createApp({
                 const matchAge = game.ageMin <= this.filters.age;
                 const configRank = { 'Mini': 1, 'Standard': 2, 'Maxi': 3 };
                 const matchMaterial = game.configLevel <= this.filters.material;
-                const matchNew = this.filters.onlyNew ? game.isNew : true;
-                const matchHeart = this.filters.onlyHeart ? game.heart : true;
-                const matchFlash = this.filters.onlyFlash ? game.isFlash : true;
-                return matchPlayer && matchAge && matchMaterial && matchFlash && matchNew && matchHeart;
+                return matchPlayer && matchAge && matchMaterial;
             }).sort((a, b) => {
-               // A. Contamos solo los verdes (🟢) para la selección actual
+                const mode = this.filters.activeSortMode;
+
+                // 1. MODO NEW: Estrictamente por fecha
+                if (mode === 'new') {
+                    return b.dateAdded - a.dateAdded;
+                }
+        
+                // 2. MODO FAV: Corazón > Nota RKF > Ranking BGG
+                if (mode === 'fav') {
+                    if (a.heart !== b.heart) return b.heart ? 1 : -1;
+                    if (a.scoreRKF !== b.scoreRKF) return b.scoreRKF - a.scoreRKF;
+                    return (parseInt(a.rankingBGG) || 30000) - (parseInt(b.rankingBGG) || 30000);
+                }
+
+                // 3. MODO FLASH: Rayo > Tiempo (Express > Courant > Long)
+                if (mode === 'flash') {
+                    if (a.isFlash !== b.isFlash) return b.isFlash ? 1 : -1;
+                    const timeMap = { '1-Express': 1, '2-Courant': 2, '3-Long': 3 };
+                    const timeA = timeMap[a.timeStart] || 3;
+                    const timeB = timeMap[b.timeStart] || 3;
+                    if (timeA !== timeB) return timeA - timeB;
+                    return (parseInt(a.rankingBGG) || 30000) - (parseInt(b.rankingBGG) || 30000);
+                }                
+                
+                // 4. MODO DEFAULT: número de verdes (🟢) > Weighted Rank
+                // A. Contamos solo los verdes (🟢) para la selección actual
                 const getGreenCount = (game) => {
                     if (this.selectedPlayers.length === 0) return 0;
                     return this.selectedPlayers.reduce((acc, p) => 
@@ -593,7 +619,14 @@ createApp({
             if (!this.showRange11to20) {
                 this.selectedPlayers = this.selectedPlayers.filter(n => n <= 10);
             }
-        },        
+        },
+        toggleSortMode(mode) {
+            if (this.filters.activeSortMode === mode) {
+                this.filters.activeSortMode = 'default';
+            } else {
+                this.filters.activeSortMode = mode;
+            }
+        }        
         toggleExpand(id) {
             if (this.expandedId === id) {
                 this.expandedId = null;
