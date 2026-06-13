@@ -511,16 +511,18 @@
                         </div>
                     
                         <!-- Bloque de Resultados de Comunidad -->
-                        <div class="text-right flex flex-col items-end">
-                            <div v-if="game.communityCount >= 5" class="bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100">
-                                <span class="text-xs font-black text-indigo-900">{{ game.communityAvg }} / 4</span>
-                                <p class="text-[8px] font-bold text-indigo-400 uppercase tracking-tighter">Note communauté</p>
+                        <div class="score-badge">
+                            <div v-if="game.communityCount > 0" class="flex flex-col items-end">
+                                <span class="text-xs font-black text-slate-900">{{ game.communityAvg }} / 4</span>
+                                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
+                                    {{ game.communityCount }} {{ game.communityCount === 1 ? 'vote' : 'votes' }}
+                                </span>
                             </div>
-                            <div v-else class="text-slate-300">
-                                <p class="text-[9px] font-bold uppercase">{{ game.communityCount }} votes</p>
-                                <p class="text-[7px] italic leading-none">Moyenne à 5 votes</p>
+                            <div v-else class="text-slate-300 italic text-[9px]">
+                                Aucun vote
                             </div>
                         </div>
+                        
                     </div>
 
                     <!-- Bloque Fidelidad (dentro de la ficha expandida) -->
@@ -911,24 +913,7 @@ createApp({
 
             try {
 
-                    // 1. Cargamos las medias de la comunidad
-                    const resVotos = await fetch(URL_VOTOS);
-                    const csvVotos = await resVotos.text();
-                    const statsComunidad = {};
-                    
-                    Papa.parse(csvVotos, {
-                        header: true,
-                        complete: (results) => {
-                            results.data.forEach(row => {
-                                statsComunidad[row.Col2] = { // Col2 es el GameID
-                                    avg: parseFloat(row.Media).toFixed(1),
-                                    count: parseInt(row.Total)
-                                };
-                            });
-                        }
-                    });
-                
-                    // 2. Cargamos los juegos y les inyectamos su media            
+                    // 1. Cargamos los juegos inmediatamente
                     const response = await fetch(URL_JUEGOS);
                     const csvText = await response.text();
                     Papa.parse(csvText, {
@@ -937,22 +922,22 @@ createApp({
                             this.games = results.data.filter(row => row.Nom_Adaptation).map((row, index) => {
                                 const author = row.Auteur || "";
                                 const rawLabels = row.Labels || "";
-                            
+                                
                                 // Construimos el ADN del juego: una lista de todas sus etiquetas posibles
                                 const gameLabels = [
                                     ...this.getLabels(row.Nom_Adaptation),
                                     ...this.getLabels(row.Jeu_Origine),
                                     ...this.getLabels(author),
                                     ...this.getLabels(rawLabels)
-                                ]; 
-
+                                ];             
+                                
                                 const gameName = row.Nom_Adaptation;
+                                // Miramos si el usuario ya tiene un voto guardado para este juego
+                                const myLocalVote = this.userVotes[gameName] || null;
+                                
                                 return {
                                     id: index, name: gameName, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
                                     author: author, labels: gameLabels,
-                                    // Inyectamos los datos de comunidad calculados arriba
-                                    communityAvg: statsComunidad[gameName]?.avg || "0.0",
-                                    communityCount: statsComunidad[gameName]?.count || 0,                                    
                                     configLevel: row.Config_materiel ? (parseInt(row.Config_materiel.charAt(0)) || 3) : 3,
                                     config: row.Config_materiel ? (row.Config_materiel.includes('-') ? row.Config_materiel.split('-')[1] : row.Config_materiel) : 'Maxi',
                                     nbPersonnes: row.Nb_personnes, timeStart: row.Temps_avant_demarrage || '3-Long', rankingBGG: row.Ranking_BGG || 'N/A',
@@ -963,14 +948,60 @@ createApp({
                                     fidelityScore: this.parseFidelity(row.Fidelite),
                                     fidelityDetails: row.Details_Fidelite, catBGG: { Famille: row.Famille !== "", Party: row.Party !== "", Abstrait: row.Abstrait !== "", Stratégie: row.Stratégie !== "" },
                                     players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG }
+                                    // Valores por defecto (se actualizarán en el Paso 2)
+                                    communityAvg: myLocalVote ? myLocalVote.toFixed(1) : "0.0", //statsComunidad[gameName]?.avg || "0.0",
+                                    communityCount: myLocalVote ? 1 : 0, //statsComunidad[gameName]?.count || 0,                                                                        
+                                    isVoteSynced: false // Indica si hemos recibido datos del servidor
                                 }
+                                                                                            
                             });
                             this.loading = false;
+
+                            // --- PASO 2: CARGAR VOTOS EN SEGUNDO PLANO ---
+                            this.fetchCommunityVotes(URL_VOTOS);                            
                         }
-                    });
-                
+                    });                
+              
             } catch(e) { alert("Erreur de synchronisation."); this.loading = false; }
         },
+        
+        async fetchCommunityVotes(url) {
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                
+                Papa.parse(csvText, {
+                    header: true,
+                    complete: (results) => {
+                        results.data.forEach(row => {
+                            const gameName = row.Col2; // Nombre del juego en el reporte de Google
+                            const serverAvg = parseFloat(row.Media) || 0;
+                            const serverCount = parseInt(row.Total) || 0;
+                            
+                            const game = this.games.find(g => g.name === gameName);
+                            if (game) {
+                                const myLocalVote = this.userVotes[gameName];
+                                
+                                // LÓGICA DE PERSISTENCIA:
+                                // Si yo he votado (local) pero el servidor dice 0 o menos votos de los que debería,
+                                // asumimos que el servidor está desactualizado y mantenemos nuestro parche local.
+                                if (myLocalVote && serverCount === 0) {
+                                    game.communityAvg = myLocalVote.toFixed(1);
+                                    game.communityCount = 1;
+                                } else {
+                                    game.communityAvg = serverAvg.toFixed(1);
+                                    game.communityCount = serverCount;
+                                }
+                                game.isVoteSynced = true;
+                            }
+                        });
+                    }
+                });
+            } catch (e) {
+                console.warn("No se pudieron sincronizar los votos, usando datos locales.");
+            }
+        },        
+
         
         async handleVote(gameId, val) {
 
@@ -985,11 +1016,16 @@ createApp({
                 comment: '' 
             };
             
-            if (val === 4) { // 😍 Parfaite
+            if (val >= 3) { // 🙂 y 😍 son directos
                 this.updateLocalStats(gameId, val); // <--- Recalcular ahora
                 this.saveLocalVote(gameId, val);    // <--- Guardar emoji
                 await this.sendToGoogle(this.currentFeedback);
-            } else {
+            } else { // 😞 y 😐 abren feedback
+                this.currentFeedback = { 
+                    gameId: gameId, rating: val, 
+                    issues: { material: false, prep: false, rules: false, exp: false, hook: false }, 
+                    comment: '' 
+                };                
                 this.showFeedbackModal = true;
             }
         },
