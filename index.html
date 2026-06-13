@@ -255,7 +255,7 @@
                 
                 <!-- Joueurs -->
                 <div class="col-span-2 md:col-span-5">
-                    <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;&nbsp;Joueurs</h3>
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Joueurs</h3>
                         
                     <!-- Fila 1: 1-5 + Control -->
                     <div class="grid grid-cols-6 gap-2 mb-2 items-center text-center">
@@ -308,7 +308,7 @@
 
                     <!-- Âge (1 de 3) -->
                     <div class="flex flex-col">              
-                        <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">Âge</h3>
+                        <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Âge</h3>
                         <select v-model="filters.age" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
                             <option :value="99">Sans limite</option>
                             <option v-for="a in [12,10,8,6]" :value="a">{{a}}-{{a+1}} ans</option>
@@ -318,7 +318,7 @@
                     <!-- Material (1 de 3) -->
                     <div class="flex flex-col">
                         <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">Matériel</h3>
+                            <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">&nbsp;Matériel</h3>
                         </div>
                         <select v-model="filters.material" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
                             <option value="3">Maxi</option>
