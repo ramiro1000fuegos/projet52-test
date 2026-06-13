@@ -947,7 +947,7 @@ createApp({
                                     dateAdded: row.Date_Publication ? new Date(row.Date_Publication) : new Date("1900-01-01"),
                                     fidelityScore: this.parseFidelity(row.Fidelite),
                                     fidelityDetails: row.Details_Fidelite, catBGG: { Famille: row.Famille !== "", Party: row.Party !== "", Abstrait: row.Abstrait !== "", Stratégie: row.Stratégie !== "" },
-                                    players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG }
+                                    players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG },
                                     // Valores por defecto (se actualizarán en el Paso 2)
                                     communityAvg: myLocalVote ? myLocalVote.toFixed(1) : "0.0", //statsComunidad[gameName]?.avg || "0.0",
                                     communityCount: myLocalVote ? 1 : 0, //statsComunidad[gameName]?.count || 0,                                                                        
