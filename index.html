@@ -964,7 +964,7 @@ createApp({
               
             } catch(e) { alert("Erreur de synchronisation."); this.loading = false; }
         },
-        
+                
         async fetchCommunityVotes(url) {
             try {
                 const response = await fetch(url);
@@ -972,19 +972,28 @@ createApp({
                 
                 Papa.parse(csvText, {
                     header: true,
+                    skipEmptyLines: true, // Evita procesar filas vacías al final
                     complete: (results) => {
+                        // DEBUG: Si quieres saber por qué falla, mira esto en la consola (F12)
+                        console.log("Cabeceras detectadas:", results.meta.fields);
+        
                         results.data.forEach(row => {
-                            const gameName = row.Col2; // Nombre del juego en el reporte de Google
-                            const serverAvg = parseFloat(row.Media) || 0;
-                            const serverCount = parseInt(row.Total) || 0;
+                            // MEJORA 1: No dependemos de "Col2". 
+                            // Usamos la primera columna que devuelva el CSV sea cual sea su nombre.
+                            const rawName = row[results.meta.fields[0]]; 
+                            if (!rawName) return;
+        
+                            const gameName = rawName.trim();
+                            const serverAvg = parseFloat(row["Media"]) || 0;
+                            const serverCount = parseInt(row["Total"]) || 0;
                             
-                            const game = this.games.find(g => g.name === gameName);
+                            // MEJORA 2: Usamos trim() para comparar sin miedo a los espacios invisibles
+                            const game = this.games.find(g => g.name.trim() === gameName);
+                            
                             if (game) {
-                                const myLocalVote = this.userVotes[gameName];
+                                const myLocalVote = this.userVotes[game.name];
                                 
-                                // LÓGICA DE PERSISTENCIA:
-                                // Si yo he votado (local) pero el servidor dice 0 o menos votos de los que debería,
-                                // asumimos que el servidor está desactualizado y mantenemos nuestro parche local.
+                                // TU LÓGICA DE PERSISTENCIA (Mantenida):
                                 if (myLocalVote && serverCount === 0) {
                                     game.communityAvg = myLocalVote.toFixed(1);
                                     game.communityCount = 1;
@@ -998,9 +1007,9 @@ createApp({
                     }
                 });
             } catch (e) {
-                console.warn("No se pudieron sincronizar los votos, usando datos locales.");
+                console.warn("Error en la sincronización:", e);
             }
-        },        
+        },  
 
         
         async handleVote(gameId, val) {
