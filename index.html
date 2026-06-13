@@ -651,6 +651,20 @@ createApp({
             } else {
                 this.filters.activeSortMode = mode;
             }
+
+            // Auto-scroll al inicio de los resultados
+            this.$nextTick(() => {
+                const header = document.getElementById('filter-section');
+                if (header) {
+                    // Calculamos la altura de la barra para frenar justo debajo
+                    const scrollTarget = header.offsetTop + header.offsetHeight + 10;
+                    window.scrollTo({
+                        top: scrollTarget,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+            
         },        
         toggleExpand(id) {
             if (this.expandedId === id) {
