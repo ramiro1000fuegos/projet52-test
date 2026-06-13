@@ -474,6 +474,29 @@
               
                 <div v-if="expandedId === game.id" class="mt-3 pt-3 space-y-4 animate-fade-in">
 
+                    <!-- Feedback -->
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
+                        <div class="flex gap-4">
+                            <!-- Votos -->
+                            <div class="flex gap-2 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                                <button @click.stop="sendFeedback(game.name, 'VOTE', 1)" class="hover:text-green-600 px-2 transition-colors">
+                                    <i class="fa-regular fa-thumbs-up"></i>
+                                </button>
+                                <button @click.stop="sendFeedback(game.name, 'VOTE', -1)" class="hover:text-red-600 px-2 transition-colors">
+                                    <i class="fa-regular fa-thumbs-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Botón avisar error -->
+                        <button @click.stop="activeFeedbackGame = game.name; showCommentModal = true" 
+                                class="text-[10px] font-bold text-slate-400 hover:text-indigo-600 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-exclamation"></i> Signaler un problème
+                        </button>
+                    </div>
+
+                    
+
                     <!-- Bloque Fidelidad (dentro de la ficha expandida) -->
                     <div class="fidelity-box">
                         <div class="flex justify-between items-center mb-1">
@@ -598,9 +621,17 @@ createApp({
                 material: 3, 
                 activeSortMode: 'default', // 'default', 'new', 'fav', 'flash'
             }
+            visitorId: localStorage.getItem('rkf_user_id') || 'user_' + Math.random().toString(36).substr(2, 9),
+            showCommentModal: false,
+            activeFeedbackGame: null,
+            commentText: '',
+            isSending: false            
         }
     },
-    mounted() { this.fetchData(); },
+    mounted() { 
+        this.fetchData(); 
+        localStorage.setItem('rkf_user_id', this.visitorId);
+    },
     computed: {
         filteredGames() {
             const searchTerms = this.getLabels(this.searchQuery);
@@ -813,6 +844,32 @@ createApp({
                     }
                 });
             } catch(e) { alert("Erreur de synchronisation."); this.loading = false; }
+        },
+        async sendFeedback(gameId, type, value) {
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5mbnvGqu7OiamO100VaCOP2McaS1SaXdZvtnPwXSzPrLe5kvn_8Uax6-e2-LrS9m-/exec";
+            this.isSending = true;
+            
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Necesario para Google Apps Script
+                    body: JSON.stringify({
+                        userId: this.visitorId,
+                        gameId: gameId,
+                        type: type,
+                        value: value
+                    })
+                });
+                if (type === 'COMMENT') {
+                    alert("Merci ! Votre message a été envoyé.");
+                    this.showCommentModal = false;
+                    this.commentText = '';
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                this.isSending = false;
+            }
         },
         extractPlayers(row) { let p = {}; for (let i = 1; i <= 21; i++) { if (row[i.toString()]) p[i] = row[i.toString()]; } return p; },
         parseFidelity(text) { if (!text) return 0; if (text.includes("4")) return 4; if (text.includes("3")) return 3; if (text.includes("2")) return 2; return 1; },
