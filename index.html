@@ -426,7 +426,7 @@
 
     
     <!-- 4. RÉSULTATS JEUX -->
-    <div v-if="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+    <div v-if="!loading" id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
        
         <div v-for="game in filteredGames" :key="game.id" 
              :id="'game-' + game.id" 
