@@ -396,17 +396,23 @@
                                 <span class="tooltip-text">Démarrage rapide</span>
                             </div>
                             <!-- Botón Fav -->
-                            <button @click="toggleSortMode('fav')" 
-                                    :class="filters.activeSortMode === 'fav' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
-                                    class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
-                                <i class="fa-solid fa-heart text-[10px]"></i>
-                            </button>
+                            <div class="has-tooltip">
+                                <button @click="toggleSortMode('fav')" 
+                                        :class="filters.activeSortMode === 'fav' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
+                                        class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
+                                    <i class="fa-solid fa-heart text-[10px]"></i>
+                                </button>
+                                <span class="tooltip-text">Meilleures adaptations</span>
+                            </div>                                
                             <!-- Botón New -->
-                            <button @click="toggleSortMode('new')" 
-                                    :class="filters.activeSortMode === 'new' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
-                                    class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            </button>
+                            <div class="has-tooltip">
+                                <button @click="toggleSortMode('new')" 
+                                        :class="filters.activeSortMode === 'new' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
+                                        class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </button>
+                                <span class="tooltip-text">Nouveautés</span>
+                            </div>
                         </div>
                     </div>
                     
