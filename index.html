@@ -984,7 +984,6 @@ createApp({
             if (val === 4) { // 😍 Parfaite
                 await this.sendToGoogle(this.currentFeedback);
                 this.saveLocalVote(gameId, val);
-                alert("Merci ! Votre vote a été enregistré.");
             } else {
                 this.showFeedbackModal = true;
             }
@@ -995,22 +994,27 @@ createApp({
             await this.sendToGoogle(this.currentFeedback);
             this.saveLocalVote(this.currentFeedback.gameId, this.currentFeedback.rating);
             this.isSending = false;
-            alert("Merci ! Votre retour nous aide à améliorer l'adaptation.");
             this.showFeedbackModal = false;
         },
         
         async sendToGoogle(payload) {
-            const URL = "https://script.google.com/macros/s/AKfycbw5mbnvGqu7OiamO100VaCOP2McaS1SaXdZvtnPwXSzPrLe5kvn_8Uax6-e2-LrS9m-/exec";
+            const URL = "https://script.google.com/macros/s/AKfycbwdwyLUa5GW3NUGqM6uSsHYBFVKzows6O-W9u33gp3a4Vseos0GdNJudXmq0Ei1gtkx/exec";
+            // Construimos el objeto final
+            const finalData = {
+                userId: this.visitorId,
+                ...payload
+            };
+        
             try {
                 await fetch(URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        userId: this.visitorId,
-                        ...payload
-                    })
+                    mode: 'no-cors', // Google Apps Script requiere esto desde GitHub
+                    headers: { 'Content-Type': 'text/plain' }, // Evita problemas de seguridad
+                    body: JSON.stringify(finalData)
                 });
-            } catch (e) { console.error("Error envío:", e); }
+            } catch (e) {
+                console.error("Error al enviar a Google:", e);
+            }
         },        
         
         extractPlayers(row) { let p = {}; for (let i = 1; i <= 21; i++) { if (row[i.toString()]) p[i] = row[i.toString()]; } return p; },
