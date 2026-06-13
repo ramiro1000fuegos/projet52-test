@@ -713,25 +713,30 @@ createApp({
                 this.filters.activeSortMode = mode;
             }
 
-            // Auto-scroll al inicio de la lista de resultados
-            this.$nextTick(() => {
+            // 2. Ejecutamos el scroll
+            // Usamos un pequeño retraso para que a Vue le dé tiempo a reordenar las fichas
+            setTimeout(() => {
                 const resultsEl = document.getElementById('results-container');
                 const filterEl = document.getElementById('filter-section');
-                
+        
                 if (resultsEl && filterEl) {
-                    // 1. Calculamos la posición del inicio de los resultados respecto a la página
-                    const resultsTop = resultsEl.getBoundingClientRect().top + window.pageYOffset;
+                    // Posición real del contenedor de juegos desde el techo de la web
+                    const containerTop = resultsEl.getBoundingClientRect().top + window.pageYOffset;
                     
-                    // 2. Medimos la altura de la barra de filtros
-                    const filterHeight = filterEl.offsetHeight;
-                    
-                    // 3. El destino es: inicio de resultados - altura filtros - margen de cortesía (12px)
+                    // Altura de la barra de filtros (que está flotando)
+                    const headerHeight = filterEl.offsetHeight;
+        
+                    // Calculamos el punto exacto:
+                    // Queremos que el inicio del contenedor coincida con el final de la barra
+                    // Restamos un poco más (ej. 16px) para que no esté pegado al borde
+                    const finalPos = containerTop - headerHeight - 16;
+        
                     window.scrollTo({
-                        top: resultsTop - filterHeight - 12,
+                        top: finalPos,
                         behavior: 'smooth'
                     });
                 }
-            });
+            }, 50); // 50 milisegundos son suficientes
             
         },        
         toggleExpand(id) {
