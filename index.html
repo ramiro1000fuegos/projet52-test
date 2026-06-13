@@ -330,9 +330,9 @@
                     <!--------------------------------------------------------------------------------------------------------------------------------------------------->
                     
                     <!-- 3. Groupe de 3 Boutons (Flash, Fav, New) -->
-                   <div class="flex flex-col">
+                    <div class="flex flex-col">
                         <!-- Etiqueta unificada para indicar que es un ORDEN -->
-                        <h3 class="text-[8px] font-black uppercase text-indigo-600 mb-1 tracking-tighter text-center leading-none">Priorité</h3>
+                        <h3 class="text-xs font-black uppercase text-slate-400 text-center tracking-widest">Priorité</h3>
                         <div class="grid grid-cols-3 gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
                             <!-- Botón Flash -->
                             <button @click="toggleSortMode('flash')" 
@@ -350,7 +350,7 @@
                             <button @click="toggleSortMode('new')" 
                                     :class="filters.activeSortMode === 'new' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
                                     class="rounded-lg flex items-center justify-center py-2 h-[30px] transition-all">
-                                <span class="text-[10px]">✨</span>
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
                             </button>
                         </div>
                     </div>
