@@ -899,10 +899,11 @@ createApp({
                         });
                     }
                 }, 100);
-
-
-                
             }
+        },        
+        saveLocalVote(gameId, val) {
+            this.userVotes[gameId] = val;
+            localStorage.setItem('rkf_user_votes', JSON.stringify(this.userVotes));
         },        
         async fetchData() {
             const URL_JUEGOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv";
@@ -970,7 +971,7 @@ createApp({
                 
             } catch(e) { alert("Erreur de synchronisation."); this.loading = false; }
         },
-
+        
         async handleVote(gameId, val) {
             // Resetear formulario
             this.currentFeedback = { 
