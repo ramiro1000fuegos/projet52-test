@@ -1050,7 +1050,7 @@ createApp({
             // 3. Calculamos la nueva media y actualizamos el objeto
             game.communityCount = currentCount;
             game.communityAvg = currentCount > 0 ? (totalScore / currentCount).toFixed(1) : "0.0";
-        }
+        },
         
         extractPlayers(row) { let p = {}; for (let i = 1; i <= 21; i++) { if (row[i.toString()]) p[i] = row[i.toString()]; } return p; },
         parseFidelity(text) { if (!text) return 0; if (text.includes("4")) return 4; if (text.includes("3")) return 3; if (text.includes("2")) return 2; return 1; },
