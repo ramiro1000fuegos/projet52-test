@@ -520,18 +520,24 @@
                     
                         <!-- Bloque de Resultados de Comunidad -->
                         <div class="score-badge">
-                            <div v-if="parseInt(game.communityCount) > 0" class="flex flex-col items-end">
-                                <span class="text-xs font-black text-slate-900">{{ game.communityAvg }} / 4</span>
-                                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
-                                    {{ game.communityCount }} {{ game.communityCount === 1 ? 'vote' : 'votes' }}
-                                </span>
-                            </div>
-                            <div v-else class="text-slate-300 italic text-[9px]">
-                                Aucun vote
-                            </div>
-                        </div>
+                            <!-- USAMOS NUMBER() PARA ASEGURAR LA COMPARACIÓN MATEMÁTICA -->
+                            <template v-if="Number(game.communityCount) >= 5">
+                                <div class="flex flex-col items-end animate-fade-in">
+                                    <span class="text-xs font-black text-slate-900">{{ game.communityAvg }} / 4</span>
+                                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Moyenne</span>
+                                </div>
+                            </template>
                         
-                    </div>
+                            <!-- SI HAY MENOS DE 5 VOTOS (INCLUYENDO 1, 2, 3, 4) -->
+                            <template v-else>
+                                <div class="flex flex-col items-end text-right leading-tight">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase">
+                                        {{ game.communityCount }} {{ Number(game.communityCount) === 1 ? 'vote' : 'votes' }}
+                                    </span>
+                                    <span class="text-[8px] text-slate-300 italic">Moyenne à 5 votes</span>
+                                </div>
+                            </template>
+                        </div>
 
                     <!-- Bloque Fidelidad (dentro de la ficha expandida) -->
                     <div class="fidelity-box">
