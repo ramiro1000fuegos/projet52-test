@@ -777,22 +777,50 @@ createApp({
                     return b.dateAdded - a.dateAdded;
                 }
         
-                // 2. MODO FAV: Corazón > Nota RKF > Ranking BGG
+                // 2. MODO FAV: Jerarquía por Tiers (Niveles)
                 if (mode === 'fav') {
-                    if (a.heart !== b.heart) return b.heart ? 1 : -1;
-                    if (a.scoreRKF !== b.scoreRKF) return b.scoreRKF - a.scoreRKF;
-                    return (parseInt(a.rankingBGG) || 30000) - (parseInt(b.rankingBGG) || 30000);
+                    const getFavWeight = (g) => {
+                        const visitorVote = parseInt(this.userVotes[g.name]) || null;
+                        const hasHeart = g.heart;
+                        let points = 0;
+                
+                        // --- PRIORIDAD 1: DETERMINAR EL TIER (EL BLOQUE PRINCIPAL) ---
+                        if (visitorVote === 4) points = 10000;      // Tier 1: Mi 4/4
+                        else if (visitorVote === 3) points = 8000;  // Tier 2: Mi 3/4
+                        else if (hasHeart && !visitorVote) points = 6000; // Tier 3: Corazón (y no lo he votado)
+                        else if (!visitorVote) points = 4000;       // Tier 4: Sin voto ni corazón (neutral)
+                        else if (visitorVote === 2) points = 2000;  // Tier 5: Mi 2/4 (descartado sutil)
+                        else if (visitorVote === 1) points = 0;     // Tier 6: Mi 1/4 (descartado absoluto)
+                
+                        // --- PRIORIDAD 2: CORAZÓN COMO DESEMPATE (Solo en Tier 1 y 2) ---
+                        // Si el usuario votó 3 o 4, el hecho de que tú también lo recomiendes le da un extra
+                        if ((visitorVote === 4 || visitorVote === 3) && hasHeart) {
+                            points += 500;
+                        }
+                
+                        // --- PRIORIDAD 3: NOTA HÍBRIDA (COMUNIDAD O AUTOR) ---
+                        // Calculamos nota en escala 0-4
+                        const communityWeight = (Number(game.communityCount) >= 5)
+                            ? parseFloat(g.communityAvg)
+                            : (parseFloat(g.scoreRKF) / 2.5);
+                        
+                        points += (communityWeight * 10); // Multiplicamos para que pese más que el BGG pero menos que el corazón
+                
+                        return points;
+                    };
+                
+                    const weightA = getFavWeight(a);
+                    const weightB = getFavWeight(b);
+                
+                    // Si los pesos (Tiers + Corazón + Nota) son distintos, ordenamos por peso
+                    if (weightB !== weightA) return weightB - weightA;
+                
+                    // --- PRIORIDAD 4: RANKING BGG (DESEMPATE FINAL) ---
+                    const bggA = parseInt(a.rankingBGG) || 30000;
+                    const bggB = parseInt(b.rankingBGG) || 30000;
+                    return bggA - bggB;
                 }
-
-                // 3. MODO FLASH: Rayo > Tiempo (Express > Courant > Long)
-                if (mode === 'flash') {
-                    if (a.isFlash !== b.isFlash) return b.isFlash ? 1 : -1;
-                    const timeMap = { '1-Express': 1, '2-Courant': 2, '3-Long': 3 };
-                    const timeA = timeMap[a.timeStart] || 3;
-                    const timeB = timeMap[b.timeStart] || 3;
-                    if (timeA !== timeB) return timeA - timeB;
-                    return (parseInt(a.rankingBGG) || 30000) - (parseInt(b.rankingBGG) || 30000);
-                }                
+                
                 
                 // 4. MODO DEFAULT: número de verdes (🟢) > Weighted Rank
                 // A. Contamos solo los verdes (🟢) para la selección actual
