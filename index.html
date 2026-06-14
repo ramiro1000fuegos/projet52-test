@@ -569,17 +569,31 @@
                             <!-- USAMOS NUMBER() PARA ASEGURAR LA COMPARACIÓN MATEMÁTICA -->
                             <template v-if="Number(game.communityCount) >= 5">
                                 <div class="flex flex-col items-end animate-fade-in">
+                                    <!---
                                     <span class="text-xs font-black text-slate-900">{{ game.communityAvg }} / 4</span>
                                     <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{{ game.communityCount }} votes</span>
+                                    -->
+                                    <div class="community-avg-text">
+                                        {{ game.communityAvg }} <span class="text-xs text-slate-300 font-bold">/ 4</span>
+                                    </div>
+                                    <div class="community-count-text">
+                                        {{ game.communityCount }} votes
+                                    </div>
+                                    
                                 </div>
                             </template>
                         
                             <!-- SI HAY MENOS DE 5 VOTOS (INCLUYENDO 1, 2, 3, 4) -->
                             <template v-else>
                                 <div class="flex flex-col items-end text-right leading-tight">
+                                    <div class="community-avg-text text-slate-200">
+                                        {{ game.communityCount }} <span class="text-[10px] uppercase">vote{{ Number(game.communityCount) === 1 ? '' : 's' }}</span>
+                                    </div>
+                                    <!--
                                     <span class="text-[10px] font-bold text-slate-400 uppercase">
                                         {{ game.communityCount }} {{ Number(game.communityCount) === 1 ? 'vote' : 'votes' }}
                                     </span>
+                                    -->
                                     <span class="text-[8px] text-slate-300 italic">Moyenne à 5 votes</span>
                                 </div>
                             </template>
