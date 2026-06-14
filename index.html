@@ -703,7 +703,7 @@
                 {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Me contacter' : 'Feedback sur l\'adaptation' }}
             </h2>
             <p class="text-xs text-rose-600 font-bold mb-6 text-center uppercase tracking-tighter">
-                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Dites-moi tout !' : 'Qu'est-ce qui ne vous a pas convaincu ?' }}                
+                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Dites-moi tout !' : 'Qu\'est-ce qui ne vous a pas convaincu ?' }}                
             </p>
             
             <div v-if="currentFeedback.gameId !== 'SITE_GLOBAL'" class="space-y-2 mb-6">
@@ -814,8 +814,7 @@ createApp({
 
             showCommentModal: false,
             activeFeedbackGame: null,
-            commentText: '',
-            isSending: false            
+            commentText: ''
         }
     },
     mounted() { 
