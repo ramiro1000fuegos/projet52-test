@@ -797,9 +797,6 @@ createApp({
             // Recuperamos sus votos anteriores para iluminar los emojis
             userVotes: JSON.parse(localStorage.getItem('rkf_user_votes') || '{}'),
 
-            year: row.Annee || "",      // Captura la columna Annee
-            authors: row.Auteur || "",   // Captura la columna Auteur
-            
             showCommentModal: false,
             activeFeedbackGame: null,
             commentText: '',
@@ -1036,6 +1033,8 @@ createApp({
                         complete: (results) => {
                             this.games = results.data.filter(row => row.Nom_Adaptation).map((row, index) => {
                                 const author = row.Auteur || "";
+                                const year = row.Annee || ""; // Asegúrate que en Excel es "Annee" sin tilde
+                                const author = row.Auteur || "";
                                 const rawLabels = row.Labels || "";
                                 
                                 // Construimos el ADN del juego: una lista de todas sus etiquetas posibles
@@ -1064,6 +1063,9 @@ createApp({
                                     fidelityDetails: row.Details_Fidelite, catBGG: { Famille: row.Famille !== "", Party: row.Party !== "", Abstrait: row.Abstrait !== "", Stratégie: row.Stratégie !== "" },
                                     players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG },
                                     // Valores por defecto (se actualizarán en el Paso 2)
+                                    year: row.Annee || "",      // Captura la columna Annee
+                                    authors: row.Auteur || "",   // Captura la columna Auteur
+            
                                     communityAvg: myLocalVote ? myLocalVote.toFixed(1) : "0.0", //statsComunidad[gameName]?.avg || "0.0",
                                     communityCount: myLocalVote ? 1 : 0, //statsComunidad[gameName]?.count || 0,                                                                        
                                     isVoteSynced: false // Indica si hemos recibido datos del servidor
