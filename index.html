@@ -801,7 +801,7 @@ createApp({
                 
                         // --- PRIORIDAD 3: NOTA HÍBRIDA (COMUNIDAD O AUTOR) ---
                         // Calculamos nota en escala 0-4
-                        const communityWeight = (Number(game.communityCount) >= 5)
+                        const communityWeight = (parseInt(g.communityCount) >= 5)
                             ? parseFloat(g.communityAvg)
                             : (parseFloat(g.scoreRKF) / 2.5);
                         
@@ -822,6 +822,15 @@ createApp({
                     return bggA - bggB;
                 }
                 
+                // 3. MODO FLASH: Rayo > Tiempo (Express > Courant > Long)
+                if (mode === 'flash') {
+                    if (a.isFlash !== b.isFlash) return b.isFlash ? 1 : -1;
+                    const timeMap = { '1-Express': 1, '2-Courant': 2, '3-Long': 3 };
+                    const timeA = timeMap[a.timeStart] || 3;
+                    const timeB = timeMap[b.timeStart] || 3;
+                    if (timeA !== timeB) return timeA - timeB;
+                    return (parseInt(a.rankingBGG) || 30000) - (parseInt(b.rankingBGG) || 30000);
+                }          
                 
                 // 4. MODO DEFAULT: número de verdes (🟢) > Weighted Rank
                 // A. Contamos solo los verdes (🟢) para la selección actual
