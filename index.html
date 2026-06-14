@@ -512,7 +512,7 @@
                     
                         <!-- Bloque de Resultados de Comunidad -->
                         <div class="score-badge">
-                            <div v-if="game.communityCount > 0" class="flex flex-col items-end">
+                            <div v-if="parseInt(game.communityCount) > 0" class="flex flex-col items-end">
                                 <span class="text-xs font-black text-slate-900">{{ game.communityAvg }} / 4</span>
                                 <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
                                     {{ game.communityCount }} {{ game.communityCount === 1 ? 'vote' : 'votes' }}
