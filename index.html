@@ -477,7 +477,16 @@
                         </h2>
                         <p class="text-s text-slate-300 font-bold mt-1 uppercase">{{ game.origin }}</p>
                     </div>
-                    <div class="text-s font-black text-slate-300">#{{ game.rankingBGG }}</div>
+                    <!--<div class="text-s font-black text-slate-300">#{{ game.rankingBGG }}</div>-->
+                    <div class="text-lg font-black text-slate-900 leading-tight uppercase"><h2>
+                        <span v-if="game.heart">❤️</span> 
+                        <span v-if="game.isNew"><span class="text-indigo-600"><i class="fa-solid fa-wand-magic-sparkles"></span></i></span> 
+                        <span v-if="game.isFlash">⚡</span> 
+                        <span v-if="userVotes[game.name]">
+                            {{ {1:'😞', 2:'😐', 3:'🙂', 4:'😍'}[userVotes[game.name]] }}
+                        </span>
+                    </h2></div>
+
                 </div>
 
                 <div class="flex flex-wrap gap-2 mb-2">
