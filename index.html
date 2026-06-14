@@ -1032,7 +1032,6 @@ createApp({
                         header: true, skipEmptyLines: true,
                         complete: (results) => {
                             this.games = results.data.filter(row => row.Nom_Adaptation).map((row, index) => {
-                                const author = row.Auteur || "";
                                 const year = row.Annee || ""; // Asegúrate que en Excel es "Annee" sin tilde
                                 const author = row.Auteur || "";
                                 const rawLabels = row.Labels || "";
