@@ -255,13 +255,29 @@
             cursor: pointer;
         }
 
+        /* Badge de puntuación más grande y legible */
         .score-badge {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             justify-content: center;
-            min-height: 32px; /* Altura fija para que la ficha no se mueva */
+            min-width: 100px; /* Un poco más de espacio horizontal */
         }
+        
+        .community-avg-text {
+            font-size: 1.25rem; /* 20px - Grande y claro */
+            font-weight: 900;
+            color: #0f172a; /* Slate 900 */
+            line-height: 1;
+        }
+        
+        .community-count-text {
+            font-size: 12px; /* text-xs */
+            font-weight: 700;
+            color: #64748b; /* Slate 500 */
+            text-transform: uppercase;
+            tracking-tighter;
+        }        
         
     </style>
 </head>
@@ -537,7 +553,7 @@
                     <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
                         <!-- Bloque de Votación -->
                         <div class="flex flex-col gap-2">
-                            <span class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Voter l'adaptation</span>
+                            <span class="text-[10px] font-black uppercase text-indigo-600 tracking-widest">J'ai testé l'adaptation :</span>
                             <div class="flex gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                                 <button v-for="(emoji, val) in {1:'😞', 2:'😐', 3:'🙂', 4:'😍'}" 
                                         @click.stop="handleVote(game.name, parseInt(val))"
