@@ -514,7 +514,25 @@
                 <p class="text-slate-600 text-s leading-relaxed" :class="expandedId === game.id ? '' : 'line-clamp-1'">{{ game.description }}</p>
               
                 <div v-if="expandedId === game.id" class="mt-3 pt-3 space-y-4 animate-fade-in">
-
+                    
+                    <!-- NUEVO: Año y Autores (Solo si está expandido y existen los datos) -->
+                    <div v-if="(game.year || game.authors)" 
+                         class="mt-2 text-[11px] text-slate-400 font-medium flex flex-wrap gap-1 items-center animate-fade-in">
+                        
+                        <!-- Año -->
+                        <span v-if="game.year" class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">
+                            {{ game.year }}
+                        </span>
+                        
+                        <!-- Separador sutil si hay ambos datos -->
+                        <span v-if="game.year && game.authors" class="mx-0.5 opacity-50">&nbsp;•&nbsp;</span>
+                        
+                        <!-- Autores -->
+                        <span v-if="game.authors" class="italic">
+                            {{ game.authors }}
+                        </span>
+                    </div>
+                    
                     <!-- Feedback -->
                     <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
                         <!-- Bloque de Votación -->
@@ -748,6 +766,9 @@ createApp({
             visitorId: localStorage.getItem('rkf_user_id') || 'user_' + Math.random().toString(36).substr(2, 9),
             // Recuperamos sus votos anteriores para iluminar los emojis
             userVotes: JSON.parse(localStorage.getItem('rkf_user_votes') || '{}'),
+
+            year: row.Annee || "",      // Captura la columna Annee
+            authors: row.Auteur || "",   // Captura la columna Auteur
             
             showCommentModal: false,
             activeFeedbackGame: null,
