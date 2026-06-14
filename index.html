@@ -419,9 +419,10 @@
                             <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">&nbsp;Matériel</h3>
                         </div>
                         <select v-model="filters.material" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
-                            <option value="3">Maxi</option>
-                            <option value="2">Standard</option>
-                            <option value="1">Mini</option>
+                            <option value="4">Maxi</option>
+                            <option value="3">Standard</option>
+                            <option value="2">Mini</option>
+                            <option value="1">Micro</option>
                         </select>
                     </div>
 
@@ -657,9 +658,10 @@
             <p>Sélectionnez une ou plusieurs configurations. Les jeux idéaux pour toutes tes sélections apparaissent en premier, puis ceux idéaux pour l'une d'elles, puis les compatibles.</p>
 
             <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Matériel</h3>
-            <p><b>Mini</b> = 1 jeu de 52 cartes, papier, stylo</p>
-            <p><b>Standard</b> = 2 jeux, jetons, dés, quelques pages imprimées réutilisables (inclut Mini)</p>
-            <p><b>Maxi</b> = matériel additionnel ou spécial (inclut Standard)</p>
+            <p><b>Micro</b> = Papier et stylo (ou même rien)</p>
+            <p><b>Mini</b> (inclut Micro) = 1 jeu de 52 cartes, papier et stylo</p>
+            <p><b>Standard</b> (inclut Mini) = 2 jeux, 10 jetons, 5 dés (ou <a href = "https://play.google.com/store/apps/details?id=fr.sevenpixels.dice">appli</a>), quelques pages imprimées réutilisables</p>
+            <p><b>Maxi</b> (inclut Standard) = matériel additionnel ou spécial</p>
 
             <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Recherche textuelle</h3>
             <p>Utilisez-la pour chercher le titre original, l'auteur, la date de publication, le titre de l'adaptation, la catégorie BGG, le matériel utilisé, une mécanique…</p>
@@ -667,7 +669,7 @@
 
             <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Priorité</h3>
             <p><b>⚡</b> = rapide à expliquer et à jouer</p>
-            <p><b>❤️</b> = meilleures adaptations</p>
+            <p><b>❤️</b> = meilleures adaptations (d'abord vos favoris, ensuite ceux de la communauté)</p>
             <p><b><span class="text-indigo-600"><i class="fa-solid fa-wand-magic-sparkles"></span></i></b> = les nouveautés d'abord</p>
 
         </div>
@@ -684,15 +686,27 @@
             <p class="mt-4">La plupart des jeux sont des adaptations de titres publiés, rendues jouables avec du matériel courant.</p>
             <p class="mt-4">Règles, illustrations et éléments protégés sont recréés ; le jeu original est toujours cité.</p>
             <p class="mt-4">Ce projet n'est pas un substitut: il encourage à découvrir les œuvres de leurs auteurs.</p>
+
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Un bug ou une idée?</h2>
+            <button @click="openContactForm" class="w-full btn-action-secondary py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-paper-plane text-indigo-500"></i>
+                Me contacter
+            </button>
+            
+            
         </div>
     </div>
 
     <div v-if="showFeedbackModal" class="modal-overlay" @click.self="showFeedbackModal = false">
         <div class="modal-content">
-            <h2 class="text-xl font-black uppercase text-slate-900 mb-2 text-center">Aidez-nous à améliorer</h2>
-            <p class="text-xs text-rose-600 font-bold mb-6 text-center uppercase tracking-tighter">Qu'est-ce qui ne vous a pas convaincu ?</p>
+            <h2 class="text-xl font-black uppercase text-slate-900 mb-2 text-center">
+                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Me contacter' : 'Feedback sur l\'adaptation' }}
+            </h2>
+            <p class="text-xs text-rose-600 font-bold mb-6 text-center uppercase tracking-tighter">
+                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Dites-moi tout !' : 'Qu'est-ce qui ne vous a pas convaincu ?' }}                
+            </p>
             
-            <div class="space-y-2 mb-6">
+            <div v-if="currentFeedback.gameId !== 'SITE_GLOBAL'" class="space-y-2 mb-6">
                 <!-- Usamos keys para mapear a las columnas del Excel -->
                 <label class="check-card">
                     <input type="checkbox" v-model="currentFeedback.issues.material">
@@ -716,7 +730,7 @@
                 </label>
             </div>
     
-            <textarea v-model="currentFeedback.comment" placeholder="Plus de détails (facultatif)..." 
+            <textarea v-model="currentFeedback.comment" placeholder="currentFeedback.gameId === 'SITE_GLOBAL' ? 'Votre message...' : 'Plus de détails (facultatif)...'"
                       class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm mb-4 h-24 outline-none focus:border-indigo-500"></textarea>
     
             <button @click="submitDetailedFeedback" :disabled="isSending"
@@ -788,7 +802,7 @@ createApp({
             },            
             filters: {
                 age: 99, 
-                material: 3, 
+                material: 4, 
                 activeSortMode: 'default', // 'default', 'new', 'fav', 'flash'
             },
             
@@ -938,6 +952,24 @@ createApp({
         }
     },
     methods: {
+        openContactForm() {
+            // Cerramos la popup de info primero
+            this.showInfoPopup = false;
+            
+            // Preparamos el formulario de feedback para el SITIO
+            this.currentFeedback = { 
+                gameId: "SITE_GLOBAL", 
+                rating: 0, // Nota neutra para mensajes
+                issues: { material: false, prep: false, rules: false, loyalty: false, taste: false }, 
+                comment: '' 
+            };
+            
+            // Abrimos el modal de feedback que ya tienes
+            setTimeout(() => {
+                this.showFeedbackModal = true;
+            }, 300);
+        },
+        
         toggleRange6to10() {
             this.showRange6to10 = !this.showRange6to10;
             if (!this.showRange6to10) {
@@ -1051,7 +1083,7 @@ createApp({
                                 return {
                                     id: index, name: gameName, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
                                     author: author, labels: gameLabels,
-                                    configLevel: row.Config_materiel ? (parseInt(row.Config_materiel.charAt(0)) || 3) : 3,
+                                    configLevel: row.Config_materiel ? (parseInt(row.Config_materiel.charAt(0)) || 4) : 4,
                                     config: row.Config_materiel ? (row.Config_materiel.includes('-') ? row.Config_materiel.split('-')[1] : row.Config_materiel) : 'Maxi',
                                     nbPersonnes: row.Nb_personnes, timeStart: row.Temps_avant_demarrage || '3-Long', rankingBGG: row.Ranking_BGG || 'N/A',
                                     scoreRKF: parseFloat(row.Note_RKF) || 5,
