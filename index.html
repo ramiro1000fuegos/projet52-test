@@ -1191,9 +1191,18 @@ createApp({
             this.isSending = true;
             this.updateLocalStats(this.currentFeedback.gameId, this.currentFeedback.rating);
             this.saveLocalVote(this.currentFeedback.gameId, this.currentFeedback.rating);            
-            await this.sendToGoogle(this.currentFeedback);
-            this.isSending = false;
-            this.showFeedbackModal = false;
+            this.sendToGoogle(this.currentFeedback);
+
+            setTimeout(() => {
+                this.isSending = false;
+                this.showFeedbackModal = false;
+                // Limpiamos el formulario para la próxima
+                this.currentFeedback = { 
+                    gameId: null, rating: null, 
+                    issues: { material: false, prep: false, rules: false, loyalty: false, taste: false }, 
+                    comment: '' 
+                };
+            }, 100); // 100ms es imperceptible pero da tiempo a que el ojo vea el clic
         },
         
         async sendToGoogle(payload) {
@@ -1205,14 +1214,14 @@ createApp({
             };
         
             try {
-                await fetch(URL, {
+                fetch(URL, {
                     method: 'POST',
                     mode: 'no-cors', // Google Apps Script requiere esto desde GitHub
                     headers: { 'Content-Type': 'text/plain' }, // Evita problemas de seguridad
                     body: JSON.stringify(finalData)
                 });
             } catch (e) {
-                console.error("Error al enviar a Google:", e);
+                console.warn("Envío de fondo fallido (se reintentará en el próximo refresh)", e);
             }
         },        
 
