@@ -538,7 +538,7 @@
 
                 <p class="text-slate-600 text-s leading-relaxed" :class="expandedId === game.id ? '' : 'line-clamp-1'">{{ game.description }}</p>
               
-                <div v-if="expandedId === game.id" class="mt-1 pt-2 animate-fade-in">
+                <div v-if="expandedId === game.id" class="mt-1 pt-2 gap-2 animate-fade-in">
                     
                     <p class="text-slate-600 text-s leading-relaxed">
                         <div v-if="(game.authors)" >Un jeu {{ formatAuthors (game.authors) }}</div>
@@ -548,7 +548,7 @@
                     <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
                         <!-- Bloque de Votación -->
                         <div class="flex flex-col gap-2">
-                            <span class="text-[10px] font-black uppercase text-indigo-600 tracking-widest">J'ai testé l'adaptation :</span>
+                            <span class="text-indigo-600 text-s font-black">J'ai testé l'adaptation :</span>
                             <div class="flex gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                                 <button v-for="(emoji, val) in {1:'😞', 2:'😐', 3:'🙂', 4:'😍'}" 
                                         @click.stop="handleVote(game.name, parseInt(val))"
