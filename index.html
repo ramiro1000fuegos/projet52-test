@@ -306,6 +306,15 @@
                     {{ filteredGames.length }} jeux adaptés au matériel du quotidien.  <!-- {{ games.length }} -->
                 </p>
             </div>
+
+            <!-- Badge de Entorno (Solo visible si NO es PROD) -->
+            <div v-if="env !== 'PROD'" 
+                 class="fixed bottom-6 left-6 z-[10000] animate-pulse">
+                <div class="bg-amber-500 text-white text-[10px] font-black px-4 py-2 rounded-2xl shadow-2xl border-2 border-white uppercase tracking-tighter">
+                    🛠️ Mode {{ env }}
+                </div>
+            </div>
+            
         </header>
     
 <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -773,7 +782,46 @@ const { createApp } = Vue
 
 createApp({
     data() {
+
+        // 1. Detección automática del entorno
+        const host = window.location.hostname;
+        const path = window.location.pathname;
+        let env = 'PROD'; 
+        
+        if (path.includes('-test')) {
+            env = 'TEST';
+        } else if (path.includes('-prex')) {
+            env = 'PRE';
+        }
+    
+        // Console log informativo para el desarrollador
+        console.log(`%c [P52] Environnement détecté : ${env} `, 'background: #1e1b4b; color: #fff; font-weight: bold;');
+        console.log(`[P52] Path actual : ${host}${path}`);
+    
+        // 2. Diccionario de URLs por entorno
+        const configs = {
+            PROD: {
+                sheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
+                votesUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLzY0YREy8dl8jWKwb94f_l8HNOGnMKcJcxsNjzaR0B3Awc3Nkgf4yvj-ncnL9ei7Wvm7_VaztaV63/pub?gid=684535740&single=true&output=csv",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbwdwyLUa5GW3NUGqM6uSsHYBFVKzows6O-W9u33gp3a4Vseos0GdNJudXmq0Ei1gtkx/exec"
+            },
+            PRE: {
+                // Usa la misma hoja de juegos que PROD pero escribe en la base de test
+                sheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
+                votesUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNnvBMKv6MUB7e-UlrR6ZTLi4nFqBy4I-yr0xbTFUHu4dWLsZkk2-BvITb8mVkp-ZQ9u-J-D9YGMDj/pub?gid=684535740&single=true&output=csv", 
+                scriptUrl: "https://script.google.com/macros/s/AKfycbzOYCeYCMxaOvqODTfyJ3Tg05yZZSays_dPV3mx2VxBD64nht-Znggom68PsiOHjZcI4A/exec"
+            },
+            TEST: {
+                // Totalmente independiente
+                sheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
+                votesUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMFoxcPpSW3pfMGJCgKpROicS4abpVjV9POlF8afNOWmbdAgCVxzLCwxqNxiznxLQ7kQJ3ehiEcHQi/pub?gid=684535740&single=true&output=csv",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbzauLQCfTAQXbbBmVS4Y0zVA8df__2bqcVeLIyyDFXfNr1DIn6APINP8JYYz-Mr0ZGp2Q/exec"
+            }
+        };
+        
         return {
+            env: env, 
+            config: configs[env], // Inyectamos la config activa
             loading: true,
             expandedId: null,
             showExtra: false,
@@ -1052,13 +1100,9 @@ createApp({
             localStorage.setItem('rkf_user_votes', JSON.stringify(this.userVotes));
         },        
         async fetchData() {
-            const URL_JUEGOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv";
-            const URL_VOTOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLzY0YREy8dl8jWKwb94f_l8HNOGnMKcJcxsNjzaR0B3Awc3Nkgf4yvj-ncnL9ei7Wvm7_VaztaV63/pub?gid=684535740&single=true&output=csv";
-
             try {
-
                     // 1. Cargamos los juegos inmediatamente
-                    const response = await fetch(URL_JUEGOS);
+                    const response = await fetch(this.config.sheetUrl);
                     const csvText = await response.text();
                     Papa.parse(csvText, {
                         header: true, skipEmptyLines: true,
@@ -1106,7 +1150,7 @@ createApp({
                             this.loading = false;
 
                             // --- PASO 2: CARGAR VOTOS EN SEGUNDO PLANO ---
-                            this.fetchCommunityVotes(URL_VOTOS);                            
+                            this.fetchCommunityVotes(this.config.votesUrl);
                         }
                     });                
               
@@ -1206,7 +1250,7 @@ createApp({
         },
         
         async sendToGoogle(payload) {
-            const URL = "https://script.google.com/macros/s/AKfycbwdwyLUa5GW3NUGqM6uSsHYBFVKzows6O-W9u33gp3a4Vseos0GdNJudXmq0Ei1gtkx/exec";
+            const URL = this.config.scriptUrl;
             // Construimos el objeto final
             const finalData = {
                 userId: this.visitorId,
