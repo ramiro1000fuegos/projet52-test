@@ -588,9 +588,11 @@
 
                     <div class="flex flex-col gap-2 mt-4">
                         <p> 
-                            <span class="text-indigo-600 text-s font-bold">Fidélité au jeu d'origine : </span><span classe="text-slate-900 text-s font-bold"> {{ game.fidelityScore }} </span><span class="text-xs text-slate-400 font-bold"> / 4</span>
+                            <span class="text-indigo-600 text-s font-bold">Fidélité au jeu d'origine : </span>
+                            <span classe="text-slate-900 text-s font-black"> {{ game.fidelityScore }} </span>
+                            <span class="text-xs text-slate-400 font-black"> / 4</span>
                         </p>                            
-                        <p class="text-slate-500 italic leading-snug">
+                        <p class="text-slate-600 text-s leading-relaxed">
                             {{ game.fidelityDetails }}
                         </p>                        
                     </div>    
@@ -612,7 +614,7 @@
                             <!-- BOTÓN 3: EL MENOS IMPORTANTE (Solo si existe link) -->
                             <a v-if="game.links.bgg" :href="game.links.bgg" target="_blank" @click.stop 
                                class="btn-pdf font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2">
-                                <i class="fa-brands fa-fort-awesome opacity-50"></i>BGG <span v-if="(game.rankingBGG)"> (Rank #{{ game.rankingBGG }})</span>
+                                <i class="fa-brands fa-fort-awesome opacity-50"></i>BGG <span v-if="(game.rankingBGG)"> #{{ game.rankingBGG }}</span>
                             </a>
                         </div>
                     </div>
