@@ -538,10 +538,10 @@
 
                 <p class="text-slate-600 text-s leading-relaxed" :class="expandedId === game.id ? '' : 'line-clamp-1'">{{ game.description }}</p>
               
-                <div v-if="expandedId === game.id" class="mt-1 pt-1 animate-fade-in">
+                <div v-if="expandedId === game.id" class="mt-1 pt-2 animate-fade-in">
                     
                     <p class="text-slate-600 text-s leading-relaxed">
-                        <div v-if="(game.authors)" >Un jeu de {{ game.authors }}</div>
+                        <div v-if="(game.authors)" >Un jeu {{ formatAuteurs (game.authors) }}</div>
                     </p>
                     
                     <!-- Feedback -->
