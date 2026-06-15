@@ -603,17 +603,14 @@
                         <div class="grid gap-2" :class="game.links.bgg ? 'grid-cols-2' : 'grid-cols-1'">
                             <!-- BOTÓN 2: UTILIDAD (PDF) -->
                             <a v-if="game.links.pdf" :href="game.links.pdf" target="_blank" @click.stop 
-                               class="btn-pdf font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2 shadow-sm">
+                               class="btn-mobile font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2 shadow-sm">
                                 <i class="fa-solid fa-file-pdf opacity-70"></i> PDF
                             </a>
                     
                             <!-- BOTÓN 3: EL MENOS IMPORTANTE (Solo si existe link) -->
                             <a v-if="game.links.bgg" :href="game.links.bgg" target="_blank" @click.stop 
-                               class="btn-bgg font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2">
-                                <i class="fa-brands fa-fort-awesome opacity-50"></i>
-                                <span>BGG</span>
-                                <span class="text-xs mt-1 opacity-60">Rank #{{ game.rankingBGG }}</span>
-
+                               class="btn-pdf font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2">
+                                <i class="fa-brands fa-fort-awesome opacity-50"></i>BGG <span v-if="(game.rankingBGG)"> (Rank #{{ game.rankingBGG }})</span>
                             </a>
                         </div>
                     </div>
