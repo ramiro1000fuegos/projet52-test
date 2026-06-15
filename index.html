@@ -546,7 +546,7 @@
                     <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
                         <!-- Bloque de Votación -->
                         <div class="flex flex-col gap-2">
-                            <span class="text-indigo-600 text-s font-black">J'ai testé l'adaptation :</span>
+                            <span class="text-indigo-600 text-s font-bold">J'ai testé l'adaptation :</span>
                             <div class="flex gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                                 <button v-for="(emoji, val) in {1:'😞', 2:'😐', 3:'🙂', 4:'😍'}" 
                                         @click.stop="handleVote(game.name, parseInt(val))"
@@ -562,12 +562,8 @@
                             <!-- USAMOS NUMBER() PARA ASEGURAR LA COMPARACIÓN MATEMÁTICA -->
                             <template v-if="Number(game.communityCount) >= 5">
                                 <div class="flex flex-col items-end animate-fade-in">
-                                    <!---
-                                    <span class="text-xs font-black text-slate-900">{{ game.communityAvg }} / 4</span>
-                                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{{ game.communityCount }} votes</span>
-                                    -->
                                     <div class="community-avg-text">
-                                        {{ game.communityAvg }} <span class="text-xs text-slate-300 font-bold">/ 4</span>
+                                        {{ game.communityAvg }} <span class="text-s text-slate-400 font-bold">/ 4</span>
                                     </div>
                                     <div class="community-count-text">
                                         {{ game.communityCount }} votes
@@ -587,7 +583,7 @@
                                         {{ game.communityCount }} {{ Number(game.communityCount) === 1 ? 'vote' : 'votes' }}
                                     </span>
                                     -->
-                                    <span class="text-[8px] text-slate-300 italic">Moyenne à 5 votes</span>
+                                    <span class="text-xs text-slate-400 italic">Moyenne à 5 votes</span>
                                 </div>
                             </template>
                         </div>
