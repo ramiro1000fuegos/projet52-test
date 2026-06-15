@@ -458,9 +458,7 @@
                                         class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
 
                                     <!-- Si el usuario NO ha votado nada: Corazón -->
-                                    <i class="fa-solid fa-heart"></i>&nbsp;
-                                    <!--<i v-if="Object.keys(userVotes).length > 0" class="fa-solid fa-face-smile"></i>-->
-
+                                    <i class="fa-solid fa-heart"></i>
                                     
                                     
                                 </button>
@@ -500,7 +498,7 @@
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex-1">
                         <h2 class="text-lg font-black text-slate-900 leading-tight uppercase"> {{ game.name }}</h2>
-                        <p class="text-s text-slate-300 font-bold mt-1 uppercase">{{ game.origin }} <span v-if="game.year">&nbsp;({{ game.year }})</span></p>
+                        <p class="text-s text-slate-300 font-bold mt-1 uppercase">{{ game.origin }} <span v-if="game.year"> ({{ game.year }})</span></p>
                     </div>
                     <!--<div class="text-s font-black text-slate-300">#{{ game.rankingBGG }}</div>-->
                     <div class="text-lg font-black text-slate-900 leading-tight uppercase"><h2>
