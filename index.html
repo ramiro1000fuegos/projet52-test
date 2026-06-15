@@ -985,6 +985,24 @@ createApp({
         }
     },
     methods: {
+
+        formatAuthors(authorsText) {
+            if (!authorsText) return '';
+            
+            const authors = authorsText.split(',').map(a => a.trim()).filter(a => a.length > 0);
+            
+            if (authors.length === 0) return '';
+            if (authors.length === 1) {
+                // Gérer le "d'" pour les voyelles
+                const firstChar = authors[0].toLowerCase().charAt(0);
+                return ['a', 'e', 'i', 'o', 'u', 'h'].includes(firstChar) ? `d'${authors[0]}` : `de ${authors[0]}`;
+            }
+            
+            // Gérer les multiples auteurs avec "et" à la fin
+            const lastAuthor = authors.pop(); // Prend le dernier
+            return `de ${authors.join(', ')} et ${lastAuthor}`;
+        },        
+        
         openContactForm() {
             // Cerramos la popup de info primero
             this.showInfoPopup = false;
