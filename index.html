@@ -1114,7 +1114,7 @@ createApp({
                                 const gameName = row.Nom_Adaptation;
                                 // Miramos si el usuario ya tiene un voto guardado para este juego
                                 const myLocalVote = this.userVotes[gameName] || null;
-                                
+                                                                                   
                                 return {
                                     id: index, name: gameName, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
                                     author: author, labels: gameLabels,
@@ -1139,6 +1139,17 @@ createApp({
                                                                                             
                             });
                             this.loading = false;
+
+                            // Recalcul isFlash : les 6 jeux avec la date de publication la plus récente
+                            const sorted = [...this.games]
+                                .filter(g => g.dateAdded > new Date("1900-01-02")) // exclure les jeux sans date
+                                .sort((a, b) => b.dateAdded - a.dateAdded)
+                                .slice(0, 6)
+                                .map(g => g.id);
+                            
+                            this.games.forEach(g => {
+                                g.isFlash = sorted.includes(g.id);
+                            });                                    
 
                             // --- PASO 2: CARGAR VOTOS EN SEGUNDO PLANO ---
                             this.fetchCommunityVotes(this.config.votesUrl);
