@@ -835,7 +835,7 @@ createApp({
             
             // Recuperamos el ID del usuario o creamos uno nuevo
             visitorId: localStorage.getItem('rkf_user_id') || 'user_' + Math.random().toString(36).substr(2, 9),
-            userVotes: JSON.parse(localStorage.getItem(`rkf_user_votes_${this.env}`) || '{}'),
+            userVotes: JSON.parse(localStorage.getItem(`rkf_user_votes_${env}`) || '{}'),
 
             showCommentModal: false,
             activeFeedbackGame: null,
