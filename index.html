@@ -536,7 +536,7 @@
                 <div v-if="expandedId === game.id" class="mt-1 pt-2 gap-2 animate-fade-in">
                     
                     <p class="text-slate-600 text-s leading-relaxed">
-                        <div v-if="(game.authors)" >Un jeu {{ formatAuthors (game.authors) }}</div>
+                        <span v-if="(game.authors)">Un jeu {{ formatAuthors(game.authors) }}</span>
                     </p>
                     
                     <!-- Feedback -->
