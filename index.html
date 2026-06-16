@@ -614,7 +614,7 @@
                     
                             <!-- BOTÓN 3: EL MENOS IMPORTANTE (Solo si existe link) -->
                             <a v-if="game.links.bgg" :href="game.links.bgg" target="_blank" @click.stop 
-                               class="btn-pdf font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2">
+                               class="btn-bgg font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2">
                                 <i class="fa-brands fa-fort-awesome opacity-50"></i>BGG <span v-if="(game.rankingBGG)"> #{{ game.rankingBGG }}</span>
                             </a>
                         </div>
