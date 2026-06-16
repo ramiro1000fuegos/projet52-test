@@ -1088,7 +1088,7 @@ createApp({
         },        
         saveLocalVote(gameId, val) {
             this.userVotes[gameId] = val;
-            localStorage.setItem('rkf_user_votes_${this.env}', JSON.stringify(this.userVotes));
+            localStorage.setItem('rkf_user_votes_${env}', JSON.stringify(this.userVotes));
         },        
         async fetchData() {
             try {
