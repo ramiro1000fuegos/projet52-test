@@ -982,9 +982,20 @@ createApp({
 
         async syncUserVotesFromCloud() {
             if (!this.config.userSyncUrl) return;
-        
+
+            // Añadimos un timestamp para evitar que el navegador o Google usen una versión vieja (Caché)
+            const urlConCacheBuster = this.config.userSyncUrl + "&t=" + Date.now();            
+            
             try {
-                const response = await fetch(this.config.userSyncUrl);
+                const response = await fetch(urlConCacheBuster, {
+                    method: 'GET',
+                    // Importante: No usamos 'no-cors' aquí porque queremos LEER el contenido
+                    mode: 'cors', 
+                    cache: 'no-store'
+                });
+        
+                if (!response.ok) throw new Error("Error en respuesta de Google");
+                
                 const csvText = await response.text();
                 
                 Papa.parse(csvText, {
