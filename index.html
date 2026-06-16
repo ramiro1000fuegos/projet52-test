@@ -791,7 +791,8 @@ createApp({
             },
             TEST: {
                 // Totalmente independiente
-                sheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
+                userSyncUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMFoxcPpSW3pfMGJCgKpROicS4abpVjV9POlF8afNOWmbdAgCVxzLCwxqNxiznxLQ7kQJ3ehiEcHQi/pub?gid=470067532&single=true&output=csv",
+                sheetUrl:    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
                 votesUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMFoxcPpSW3pfMGJCgKpROicS4abpVjV9POlF8afNOWmbdAgCVxzLCwxqNxiznxLQ7kQJ3ehiEcHQi/pub?gid=684535740&single=true&output=csv",
                 scriptUrl: "https://script.google.com/macros/s/AKfycbzauLQCfTAQXbbBmVS4Y0zVA8df__2bqcVeLIyyDFXfNr1DIn6APINP8JYYz-Mr0ZGp2Q/exec"
             }
@@ -836,6 +837,7 @@ createApp({
             // Recuperamos el ID del usuario o creamos uno nuevo
             visitorId: localStorage.getItem('rkf_user_id') || 'user_' + Math.random().toString(36).substr(2, 9),
             userVotes: JSON.parse(localStorage.getItem(`rkf_user_votes_${env}`) || '{}'),
+            voteTimestamps: JSON.parse(localStorage.getItem(`rkf_vote_ts_${env}`) || '{}'),
 
             showCommentModal: false,
             activeFeedbackGame: null,
@@ -978,6 +980,53 @@ createApp({
     },
     methods: {
 
+        async syncUserVotesFromCloud() {
+            if (!this.config.userSyncUrl) return;
+        
+            try {
+                const response = await fetch(this.config.userSyncUrl);
+                const csvText = await response.text();
+                
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        let hasChanges = false;
+                        const DIEZ_MINUTOS = 10 * 60 * 1000; // 600,000 ms
+
+                        
+                        results.data.forEach(row => {
+                            // Verificamos si la fila pertenece al usuario actual
+                            // Nota: Los nombres de las columnas dependen del LABEL de tu QUERY
+                            if (row.User === this.visitorId) {
+                                const gameName = row.Game;
+                                const cloudRating = parseInt(row.Vote);
+
+                                // --- EL ESCUDO ---
+                                const lastLocalVoteTime = this.voteTimestamps[gameName] || 0;
+                                const esReciente = (Date.now() - lastLocalVoteTime) < DIEZ_MINUTOS;
+
+                                // SOLO sincronizamos si NO es reciente Y el valor es distinto
+                                if (!esReciente && this.userVotes[gameName] !== cloudRating) {
+                                    this.userVotes[gameName] = cloudRating;
+                                    hasChanges = true;
+                                    console.log(`[Sync] Actualizado ${gameName} desde la nube.`);
+                                }
+                               
+                            }
+                        });
+        
+                        if (hasChanges) {
+                            console.log("[P52] Votos sincronizados con la nube (Historial recuperado)");
+                            localStorage.setItem(`rkf_user_votes_${this.env}`, JSON.stringify(this.userVotes));
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn("Sincronización de historial no disponible.");
+            }
+        },        
+        
         formatAuthors(authorsText) {
             if (!authorsText) return '';
             
@@ -1092,8 +1141,10 @@ createApp({
         },        
         saveLocalVote(gameId, val) {
             this.userVotes[gameId] = val;
+            this.voteTimestamps[gameId] = Date.now(); 
             console.log('Clé écrite:', `rkf_user_votes_${this.env}`);
             localStorage.setItem(`rkf_user_votes_${this.env}`, JSON.stringify(this.userVotes));
+            localStorage.setItem(`rkf_vote_ts_${this.env}`, JSON.stringify(this.voteTimestamps));
         },        
         async fetchData() {
             try {
@@ -1158,6 +1209,7 @@ createApp({
 
                             // --- PASO 2: CARGAR VOTOS EN SEGUNDO PLANO ---
                             this.fetchCommunityVotes(this.config.votesUrl);
+                            this.syncUserVotesFromCloud(); // <--- Sincroniza los votos del usuario
                         }
                     });                
               
