@@ -1148,7 +1148,7 @@ createApp({
                                 .map(g => g.id);
                             
                             this.games.forEach(g => {
-                                g.isFlash = sorted.includes(g.id);
+                                g.isNew = sorted.includes(g.id);
                             });                                    
 
                             // --- PASO 2: CARGAR VOTOS EN SEGUNDO PLANO ---
